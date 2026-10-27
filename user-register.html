@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Registration — DocBook</title>
+    <meta name="description" content="Register as a patient on DocBook to schedule appointments and access healthcare services.">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 1.5rem;
+            background: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                        linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+        }
+
+        .auth-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 460px;
+            padding: 2.5rem 2.2rem;
+            box-shadow: 0 20px 40px -10px rgba(30, 58, 138, 0.12);
+            text-align: center;
+        }
+
+        .auth-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            
+            <a href="index.html" class="auth-logo">
+                <div class="brand-icon"><i class="ri-heart-pulse-fill"></i></div>
+                <span>Doc<span style="color:var(--text-primary)">Book</span></span>
+            </a>
+
+            <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:0.3rem">Create Patient Account</h2>
+            <p style="color:var(--text-muted);font-size:0.92rem;margin-bottom:1.8rem">Register to schedule appointments and track health</p>
+
+            <form id="patientRegisterForm" onsubmit="handlePatientRegister(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" id="name" class="form-control" placeholder="e.g. Alex Johnson" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address *</label>
+                    <input type="email" id="email" class="form-control" placeholder="alex@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mobile Number *</label>
+                    <input type="tel" id="mobile" class="form-control" placeholder="+91 98765 43210" required>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                    <div class="form-group">
+                        <label class="form-label">Password *</label>
+                        <input type="password" id="password" class="form-control" placeholder="Minimum 6 chars" required minlength="4">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm *</label>
+                        <input type="password" id="confirmPassword" class="form-control" placeholder="Repeat password" required>
+                    </div>
+                </div>
+
+                <div id="registerMsg" style="margin-bottom:1rem;font-size:0.88rem;font-weight:600;min-height:22px"></div>
+
+                <button type="submit" class="btn btn-primary btn-lg" style="width:100%;margin-bottom:1.2rem">
+                    <i class="ri-user-add-line"></i> Register as Patient
+                </button>
+            </form>
+
+            <p style="font-size:0.9rem;color:var(--text-secondary)">
+                Already have an account? 
+                <a href="login.html" style="font-weight:700">Sign In</a>
+            </p>
+
+            <div style="margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid var(--border-color);display:flex;justify-content:space-between;font-size:0.85rem">
+                <a href="doctor-register.html" style="color:var(--text-muted)">Register as Doctor instead</a>
+                <a href="index.html" style="color:var(--text-muted)">Back Home</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Storage Script -->
+    <script src="docbook-storage.js"></script>
+
+    <script>
+        function handlePatientRegister(e) {
+            e.preventDefault();
+
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const mobile = document.getElementById("mobile").value.trim();
+            const password = document.getElementById("password").value;
+            const confirm = document.getElementById("confirmPassword").value;
+            const msg = document.getElementById("registerMsg");
+
+            if (password !== confirm) {
+                msg.style.color = "var(--status-cancelled)";
+                msg.textContent = "Passwords do not match!";
+                return;
+            }
+
+            const res = DocBookDB.registerUser({
+                name,
+                email,
+                mobile,
+                password
+            });
+
+            if (res.success) {
+                msg.style.color = "var(--status-confirmed)";
+                msg.textContent = "✔ Account created! Logging you in...";
+
+                // Auto-login
+                DocBookDB.login(email, password);
+
+                setTimeout(() => {
+                    window.location.href = "user-dashboard.html";
+                }, 1000);
+            } else {
+                msg.style.color = "var(--status-cancelled)";
+                msg.textContent = res.message;
+            }
+        }
+    </script>
+</body>
+</html>

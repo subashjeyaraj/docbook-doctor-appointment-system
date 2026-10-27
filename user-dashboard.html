@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Portal Dashboard — DocBook</title>
+    <meta name="description" content="View your doctor appointments, prescriptions, and healthcare schedule.">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .dashboard-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            color: white;
+            padding: 2.2rem 1.8rem;
+            border-radius: var(--radius-xl);
+            margin-bottom: 2.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.25);
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .portal-shortcuts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .shortcut-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .shortcut-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .shortcut-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .patient-card-box {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 1.8rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+        }
+
+        .patient-appt-row {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .patient-appt-row:hover {
+            background: white;
+            border-color: rgba(59, 130, 246, 0.35);
+        }
+
+        .appt-left h4 {
+            font-size: 1.15rem;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .appt-meta-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-top: 0.35rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="site-navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="brand-logo">
+                <div class="brand-icon"><i class="ri-heart-pulse-fill"></i></div>
+                <span>Doc<span class="highlight">Book</span></span>
+            </a>
+
+            <button class="mobile-toggle" onclick="toggleMenu()" aria-label="Toggle navigation">
+                <i class="ri-menu-line"></i>
+            </button>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link"><i class="ri-home-4-line"></i> Home</a></li>
+                <li><a href="appointment.html" class="nav-link"><i class="ri-calendar-check-line"></i> Appointments</a></li>
+                <li><a href="user-dashboard.html" class="nav-link active"><i class="ri-dashboard-line"></i> Patient Portal</a></li>
+                <li><a href="symptoms.html" class="nav-link"><i class="ri-stethoscope-line"></i> Symptoms</a></li>
+                <li><a href="hospitals.html" class="nav-link"><i class="ri-hospital-line"></i> Hospitals</a></li>
+                <li><a href="ai-help.html" class="nav-link"><i class="ri-robot-2-line"></i> AI Assistant</a></li>
+                <li><a href="ecart.html" class="nav-link"><i class="ri-shopping-bag-3-line"></i> Pharmacy</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="ecart.html" class="cart-link-btn" title="View Medicine Cart">
+                    <i class="ri-shopping-cart-line"></i>
+                    <span class="cart-badge" id="navCartCount" style="display:none">0</span>
+                </a>
+
+                <div id="navAuthContainer"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container">
+
+        <!-- DASHBOARD HEADER -->
+        <div class="dashboard-header">
+            <div>
+                <span class="badge" style="background:rgba(255,255,255,0.2);color:white;margin-bottom:0.6rem">
+                    👤 Patient Health Portal
+                </span>
+                <h1 id="userGreeting">Welcome Back</h1>
+                <p id="userEmailSub" style="opacity:0.9;font-size:0.95rem">Manage your medical appointments, tests, and prescriptions</p>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:0.8rem">
+                <a href="appointment.html" class="btn btn-light">
+                    <i class="ri-calendar-add-line"></i> Book New Doctor
+                </a>
+                <button class="btn btn-light" onclick="DocBookDB.logout()">
+                    <i class="ri-logout-box-r-line"></i> Sign Out
+                </button>
+            </div>
+        </div>
+
+        <!-- QUICK SHORTCUTS -->
+        <div class="portal-shortcuts">
+            <a href="appointment.html" class="shortcut-item">
+                <div class="shortcut-icon" style="background:#eff6ff;color:#3b82f6">
+                    <i class="ri-calendar-check-line"></i>
+                </div>
+                <div>
+                    <div style="font-weight:700">Find Doctors</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Schedule a visit</div>
+                </div>
+            </a>
+
+            <a href="symptoms.html" class="shortcut-item">
+                <div class="shortcut-icon" style="background:#fef3c7;color:#d97706">
+                    <i class="ri-stethoscope-line"></i>
+                </div>
+                <div>
+                    <div style="font-weight:700">Symptom Checker</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Identify specialist</div>
+                </div>
+            </a>
+
+            <a href="hospitals.html" class="shortcut-item">
+                <div class="shortcut-icon" style="background:#fee2e2;color:#ef4444">
+                    <i class="ri-map-pin-2-line"></i>
+                </div>
+                <div>
+                    <div style="font-weight:700">Hospital Radar</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Emergency finder</div>
+                </div>
+            </a>
+
+            <a href="ecart.html" class="shortcut-item">
+                <div class="shortcut-icon" style="background:#ecfdf5;color:#10b981">
+                    <i class="ri-shopping-cart-2-line"></i>
+                </div>
+                <div>
+                    <div style="font-weight:700">Pharmacy Store</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Order medicines</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- MY APPOINTMENTS TABLE -->
+        <div class="patient-card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+                <div>
+                    <h3 style="font-size:1.3rem;font-weight:700">Your Consultations & Appointments</h3>
+                    <p style="color:var(--text-muted);font-size:0.88rem">Active and completed medical bookings</p>
+                </div>
+                <button class="btn btn-sm btn-secondary" onclick="loadPatientAppointments()">
+                    <i class="ri-refresh-line"></i> Refresh
+                </button>
+            </div>
+
+            <div id="patientApptsList">
+                <p style="text-align:center;padding:2rem;color:var(--text-muted)">Loading your appointments...</p>
+            </div>
+        </div>
+
+        <!-- RECENT PHARMACY ORDERS -->
+        <div class="patient-card-box">
+            <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:0.4rem">Recent Medicine Orders</h3>
+            <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1.2rem">Track your healthcare prescriptions & essentials</p>
+
+            <div id="recentOrdersList">
+                <p style="color:var(--text-muted);font-size:0.9rem">No online medicine orders placed yet.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- TOAST -->
+    <div id="toastMessage" class="toast-msg"></div>
+
+    <!-- Storage Script -->
+    <script src="docbook-storage.js"></script>
+
+    <script>
+        let currentPatient = null;
+
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("show");
+        }
+
+        function showToast(message, type = "success") {
+            const toast = document.getElementById("toastMessage");
+            toast.textContent = message;
+            toast.className = `toast-msg show toast-${type}`;
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3500);
+        }
+
+        function checkPatientAuth() {
+            let user = DocBookDB.getCurrentUser();
+
+            if (!user) {
+                const autoDemo = confirm("You are currently not signed in. Would you like to view the dashboard with Demo Patient (Alex Johnson)?");
+                if (autoDemo) {
+                    DocBookDB.login("patient@docbook.com", "patient123");
+                    user = DocBookDB.getCurrentUser();
+                } else {
+                    window.location.href = "login.html";
+                    return;
+                }
+            }
+
+            currentPatient = user;
+            document.getElementById("userGreeting").textContent = `Welcome, ${user.name}`;
+            document.getElementById("userEmailSub").textContent = `Account: ${user.email} • Verified Patient`;
+
+            loadPatientAppointments();
+            loadPatientOrders();
+        }
+
+        function loadPatientAppointments() {
+            if (!currentPatient) return;
+
+            const appts = DocBookDB.getAppointmentsByEmail(currentPatient.email);
+            const container = document.getElementById("patientApptsList");
+
+            if (!appts || appts.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:3rem 1rem;color:var(--text-muted)">
+                        <i class="ri-calendar-line" style="font-size:2.5rem;color:var(--text-light)"></i>
+                        <p style="margin-top:0.8rem;margin-bottom:1.2rem">You have not scheduled any doctor appointments yet.</p>
+                        <a href="appointment.html" class="btn btn-primary">
+                            <i class="ri-add-line"></i> Book an Appointment
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = appts.map(appt => {
+                const statusBadge = appt.status === "Confirmed" ? "badge-confirmed" : (appt.status === "Cancelled" ? "badge-cancelled" : "badge-pending");
+
+                return `
+                    <div class="patient-appt-row">
+                        <div class="appt-left">
+                            <div style="display:flex;align-items:center;gap:0.8rem">
+                                <h4>${appt.doctor_name}</h4>
+                                <span class="badge ${statusBadge}">● ${appt.status}</span>
+                            </div>
+                            <div class="appt-meta-tags">
+                                <span><i class="ri-calendar-line" style="color:var(--primary)"></i> ${appt.appt_date}</span>
+                                <span><i class="ri-time-line" style="color:var(--primary)"></i> ${appt.appt_time || '10:00 AM'}</span>
+                                <span><i class="ri-phone-line" style="color:var(--primary)"></i> ${appt.patient_mobile}</span>
+                            </div>
+                            <div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.4rem">
+                                <b>Reason for visit:</b> ${appt.reason || 'General Health Consultation'}
+                            </div>
+                        </div>
+
+                        <div>
+                            ${appt.status === 'Pending' ? `
+                                <button class="btn btn-sm btn-danger" onclick="cancelAppt(${appt.id})">
+                                    <i class="ri-close-line"></i> Cancel
+                                </button>
+                            ` : (appt.status === 'Confirmed' ? `
+                                <span style="color:var(--status-confirmed);font-weight:700;font-size:0.88rem;display:flex;align-items:center;gap:0.3rem">
+                                    <i class="ri-checkbox-circle-fill"></i> Ready for visit
+                                </span>
+                            ` : `
+                                <span style="color:var(--text-light);font-size:0.85rem">Cancelled</span>
+                            `)}
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function cancelAppt(id) {
+            if (confirm("Cancel this appointment?")) {
+                DocBookDB.updateAppointmentStatus(id, "Cancelled");
+                showToast("Appointment cancelled successfully.", "info");
+                loadPatientAppointments();
+            }
+        }
+
+        function loadPatientOrders() {
+            const orders = DocBookDB.getOrders();
+            const container = document.getElementById("recentOrdersList");
+
+            if (!orders || orders.length === 0) {
+                container.innerHTML = `<p style="color:var(--text-muted);font-size:0.9rem">No online medicine orders placed yet. <a href="ecart.html">Browse Pharmacy Store →</a></p>`;
+                return;
+            }
+
+            container.innerHTML = orders.map(ord => `
+                <div style="background:var(--bg-card-alt);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:1rem;margin-bottom:0.8rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+                    <div>
+                        <div style="font-weight:700;color:var(--text-primary)">Order ${ord.id}</div>
+                        <div style="font-size:0.82rem;color:var(--text-muted)">Placed: ${new Date(ord.placedAt).toLocaleDateString()} • Items: ${ord.items ? ord.items.length : '1'}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:1rem">
+                        <span class="badge badge-confirmed">● ${ord.status || 'Dispatched'}</span>
+                        <span style="font-weight:700;color:var(--primary)">₹${ord.total || 0}</span>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            checkPatientAuth();
+        });
+    </script>
+</body>
+</html>

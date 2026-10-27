@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — DocBook</title>
+    <meta name="description" content="Sign in to your DocBook Patient or Doctor portal.">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            background: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                        linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+        }
+
+        .auth-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 440px;
+            padding: 2.5rem 2.2rem;
+            box-shadow: 0 20px 40px -10px rgba(30, 58, 138, 0.12);
+            text-align: center;
+            position: relative;
+        }
+
+        .auth-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .demo-pill-container {
+            background: var(--bg-card-alt);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        .demo-pill-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .demo-btn-row {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .demo-btn {
+            flex: 1;
+            padding: 0.55rem 0.6rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-primary);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .demo-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            
+            <a href="index.html" class="auth-logo">
+                <div class="brand-icon"><i class="ri-heart-pulse-fill"></i></div>
+                <span>Doc<span style="color:var(--text-primary)">Book</span></span>
+            </a>
+
+            <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:0.3rem">Welcome Back</h2>
+            <p style="color:var(--text-muted);font-size:0.92rem">Log in to manage appointments & consultations</p>
+
+            <!-- 1-Click Demo Buttons -->
+            <div class="demo-pill-container">
+                <div class="demo-pill-title">
+                    <i class="ri-flashlight-line" style="color:var(--primary)"></i> 1-Click Instant Demo Login
+                </div>
+                <div class="demo-btn-row">
+                    <button type="button" class="demo-btn" onclick="fillDemo('patient')">
+                        <i class="ri-user-smile-line" style="color:var(--primary)"></i> Patient
+                    </button>
+                    <button type="button" class="demo-btn" onclick="fillDemo('doctor')">
+                        <i class="ri-stethoscope-line" style="color:var(--secondary)"></i> Doctor
+                    </button>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.45rem">
+                        <label class="form-label" style="margin-bottom:0">Password</label>
+                    </div>
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+
+                <div id="loginMsg" style="margin-bottom:1rem;font-size:0.88rem;font-weight:600;min-height:22px"></div>
+
+                <button type="submit" class="btn btn-primary btn-lg" style="width:100%;margin-bottom:1.2rem">
+                    <i class="ri-login-box-line"></i> Sign In
+                </button>
+            </form>
+
+            <p style="font-size:0.9rem;color:var(--text-secondary)">
+                Don't have an account yet? 
+                <a href="register.html" style="font-weight:700">Create Account</a>
+            </p>
+
+            <div style="margin-top:1.8rem;padding-top:1.2rem;border-top:1px solid var(--border-color)">
+                <a href="index.html" style="color:var(--text-muted);font-size:0.88rem;display:inline-flex;align-items:center;gap:0.3rem">
+                    <i class="ri-arrow-left-line"></i> Back to Homepage
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Storage Script -->
+    <script src="docbook-storage.js"></script>
+
+    <script>
+        function fillDemo(type) {
+            const emailInput = document.getElementById("email");
+            const passInput = document.getElementById("password");
+            const msg = document.getElementById("loginMsg");
+
+            if (type === "patient") {
+                emailInput.value = "patient@docbook.com";
+                passInput.value = "patient123";
+                msg.style.color = "var(--primary)";
+                msg.textContent = "Loaded Patient Demo: Alex Johnson";
+            } else if (type === "doctor") {
+                emailInput.value = "doctor@docbook.com";
+                passInput.value = "doctor123";
+                msg.style.color = "var(--secondary-hover)";
+                msg.textContent = "Loaded Doctor Demo: Dr. Sarah Jenkins";
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            const msg = document.getElementById("loginMsg");
+
+            const res = DocBookDB.login(email, password);
+
+            if (res.success) {
+                msg.style.color = "var(--status-confirmed)";
+                msg.textContent = "✔ Login successful! Redirecting to portal...";
+
+                setTimeout(() => {
+                    if (res.user.role === "doctor") {
+                        window.location.href = "doctor-dashboard.html";
+                    } else {
+                        window.location.href = "user-dashboard.html";
+                    }
+                }, 800);
+            } else {
+                msg.style.color = "var(--status-cancelled)";
+                msg.textContent = res.message;
+            }
+        }
+
+        // Check if already logged in
+        document.addEventListener("DOMContentLoaded", () => {
+            const user = DocBookDB.getCurrentUser();
+            if (user) {
+                const msg = document.getElementById("loginMsg");
+                msg.style.color = "var(--primary)";
+                msg.innerHTML = `Signed in as <b>${user.name}</b>. <a href="${user.role === 'doctor' ? 'doctor-dashboard.html' : 'user-dashboard.html'}">Go to Dashboard →</a>`;
+            }
+        });
+    </script>
+</body>
+</html>

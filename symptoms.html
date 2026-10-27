@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Specialist Checker — DocBook</title>
+    <meta name="description" content="Check your medical symptoms, determine the right doctor specialist to consult, and get verified home care tips.">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .symptom-container {
+            max-width: 920px;
+            margin: 0 auto;
+        }
+
+        .symptom-selection-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 2.2rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2.5rem;
+        }
+
+        .symptom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0 2rem;
+        }
+
+        .symptom-chip {
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-card-alt);
+            border-radius: var(--radius-md);
+            padding: 0.95rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .symptom-chip:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .symptom-chip.selected {
+            background: #eff6ff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .symptom-chip input {
+            display: none;
+        }
+
+        .symptom-chip .chip-icon {
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+
+        .symptom-chip.selected .chip-icon {
+            color: var(--primary-dark);
+        }
+
+        .symptom-chip .chip-label {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Results Box */
+        .result-panel {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 2.2rem;
+            box-shadow: var(--shadow-md);
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .specialist-card-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.2rem;
+            margin: 1.5rem 0;
+        }
+
+        .spec-item {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="site-navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="brand-logo">
+                <div class="brand-icon"><i class="ri-heart-pulse-fill"></i></div>
+                <span>Doc<span class="highlight">Book</span></span>
+            </a>
+
+            <button class="mobile-toggle" onclick="toggleMenu()" aria-label="Toggle navigation">
+                <i class="ri-menu-line"></i>
+            </button>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link"><i class="ri-home-4-line"></i> Home</a></li>
+                <li><a href="appointment.html" class="nav-link"><i class="ri-calendar-check-line"></i> Appointments</a></li>
+                <li><a href="symptoms.html" class="nav-link active"><i class="ri-stethoscope-line"></i> Symptoms</a></li>
+                <li><a href="hospitals.html" class="nav-link"><i class="ri-hospital-line"></i> Hospitals</a></li>
+                <li><a href="ai-help.html" class="nav-link"><i class="ri-robot-2-line"></i> AI Assistant</a></li>
+                <li><a href="ecart.html" class="nav-link"><i class="ri-shopping-bag-3-line"></i> Pharmacy</a></li>
+                <li><a href="about.html" class="nav-link"><i class="ri-information-line"></i> About</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="ecart.html" class="cart-link-btn" title="View Medicine Cart">
+                    <i class="ri-shopping-cart-line"></i>
+                    <span class="cart-badge" id="navCartCount" style="display:none">0</span>
+                </a>
+
+                <div id="navAuthContainer">
+                    <a href="login.html" class="nav-btn nav-btn-outline">Sign In</a>
+                    <a href="register.html" class="nav-btn nav-btn-solid">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container">
+
+        <div class="symptom-container">
+            
+            <div class="section-header">
+                <span class="section-badge">Diagnostic Triage</span>
+                <h1 class="section-title">Smart Symptom Checker</h1>
+                <p class="section-desc">Select the symptoms you are experiencing to discover the right medical specialist to consult and review clinical self-care guidelines.</p>
+            </div>
+
+            <div class="symptom-selection-card">
+                <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:0.4rem">1. Select What You Are Experiencing:</h3>
+                <p style="color:var(--text-muted);font-size:0.88rem">Choose one or more symptoms below for analysis</p>
+
+                <div class="symptom-grid" id="symptomGrid">
+                    <!-- Chips -->
+                    <label class="symptom-chip" onclick="toggleChip(this)">
+                        <input type="checkbox" value="fever">
+                        <i class="ri-temp-hot-line chip-icon"></i>
+                        <span class="chip-label">High Fever / Chills</span>
+                    </label>
+
+                    <label class="symptom-chip" onclick="toggleChip(this)">
+                        <input type="checkbox" value="cough">
+                        <i class="ri-lungs-line chip-icon"></i>
+                        <span class="chip-label">Persistent Cough</span>
+                    </label>
+
+                    <label class="symptom-chip" onclick="toggleChip(this)">
+                        <input type="checkbox" value="cold">
+                        <i class="ri-virus-line chip-icon"></i>
+                        <span class="chip-label">Runny Nose / Cold</span>
+                    </label>
+
+                    <label class="symptom-chip" onclick="toggleChip(this)">
+                        <input type="checkbox" value="headache">
+                        <i class="ri-mental-health-line chip-icon"></i>
+                        <span class="chip-label">Headache / Migraine</span>
+                    </label>
+
+                    <label class="symptom-chip" onclick="toggleChip(this)">
+                        <input type="checkbox" value="chest">
+                        <i class="ri-heart-pulse-line chip-icon" style="color:#ef4444"></i>
+                        <span class="chip-label">Chest Tightness</span>
+                    </label>
+
+                    <label class="symptom-chip" onclick="toggleChip(this)">
+                        <input type="checkbox" value="stomach">
+                        <i class="ri-medicine-bottle-line chip-icon"></i>
+                        <span class="chip-label">Stomach / Abdominal Pain</span>
+                    </label>
+
+                    <label class="symptom-chip" onclick="toggleChip(this)">
+                        <input type="checkbox" value="nausea">
+                        <i class="ri-empathize-line chip-icon"></i>
+                        <span class="chip-label">Nausea & Vomiting</span>
+                    </label>
+
+                    <label class="symptom-chip" onclick="toggleChip(this)">
+                        <input type="checkbox" value="rash">
+                        <i class="ri-hand-sanitizer-line chip-icon"></i>
+                        <span class="chip-label">Skin Rash / Itching</span>
+                    </label>
+
+                    <label class="symptom-chip" onclick="toggleChip(this)">
+                        <input type="checkbox" value="joints">
+                        <i class="ri-walk-line chip-icon"></i>
+                        <span class="chip-label">Joint / Back Pain</span>
+                    </label>
+
+                    <label class="symptom-chip" onclick="toggleChip(this)">
+                        <input type="checkbox" value="fatigue">
+                        <i class="ri-battery-low-line chip-icon"></i>
+                        <span class="chip-label">Extreme Fatigue</span>
+                    </label>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+                    <div style="color:var(--text-muted);font-size:0.88rem" id="selectedCountText">0 symptoms selected</div>
+                    <div style="display:flex;gap:0.8rem">
+                        <button class="btn btn-secondary" onclick="clearSymptoms()">Reset</button>
+                        <button class="btn btn-primary" onclick="analyzeSymptoms()">
+                            <i class="ri-sparkling-fill"></i> Analyze & Recommend
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULT PANEL -->
+            <div class="result-panel" id="resultPanel">
+                <div id="emergencyWarningBox" style="display:none">
+                    <div style="background:#fee2e2;border-left:5px solid #ef4444;padding:1.2rem;border-radius:var(--radius-md);margin-bottom:1.5rem">
+                        <div style="font-weight:700;color:#991b1b;font-size:1.05rem;display:flex;align-items:center;gap:0.5rem">
+                            <i class="ri-alarm-warning-fill"></i> Critical Symptom Alert
+                        </div>
+                        <p style="color:#b91c1c;font-size:0.92rem;margin-top:0.4rem">
+                            You selected symptoms like chest tightness or breathing distress. If you feel pressure radiating to your arms or jaw, please seek immediate emergency care at the nearest hospital.
+                        </p>
+                        <a href="hospitals.html" class="btn btn-sm btn-danger" style="margin-top:0.8rem">
+                            <i class="ri-map-pin-line"></i> View Nearby Emergency Hospitals
+                        </a>
+                    </div>
+                </div>
+
+                <h3 style="font-size:1.4rem;font-weight:700;margin-bottom:0.4rem">Diagnostic Assessment Results</h3>
+                <p style="color:var(--text-muted);font-size:0.92rem">Based on your selected symptoms, here are the recommended medical specialists:</p>
+
+                <div class="specialist-card-row" id="specialistRecommendations">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <div style="background:var(--bg-card-alt);border-radius:var(--radius-lg);padding:1.4rem;border:1px solid var(--border-color);margin-top:1.5rem">
+                    <h4 style="font-size:1.05rem;color:var(--text-primary);margin-bottom:0.5rem">
+                        <i class="ri-shield-cross-line" style="color:var(--primary)"></i> Initial Care & Home Advice
+                    </h4>
+                    <ul id="homeCareList" style="margin-left:1.4rem;font-size:0.92rem;color:var(--text-secondary);line-height:1.7">
+                        <!-- Rendered dynamically -->
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3><i class="ri-heart-pulse-fill" style="color:#38bdf8"></i> DocBook</h3>
+                <p>DocBook symptom checker guides patients to the most appropriate specialty consultations.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Navigation</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="appointment.html">Book Doctors</a></li>
+                    <li><a href="hospitals.html">Hospitals Radar</a></li>
+                    <li><a href="ai-help.html">AI Assistant</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Pharmacy</h4>
+                <ul class="footer-links">
+                    <li><a href="ecart.html">E-Cart Medicines</a></li>
+                    <li><a href="about.html">About Team</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <div class="emergency-hotline-box">
+                    <h5>Emergency Helpline</h5>
+                    <p class="phone">108 / 112</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>© 2026 DocBook Healthcare System. Open Source & Frontend Only.</div>
+        </div>
+    </footer>
+
+    <!-- Storage Script -->
+    <script src="docbook-storage.js"></script>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("show");
+        }
+
+        const symptomSpecialistMap = {
+            "fever": { specialist: "General Physician", advice: "Hydrate adequately with electrolytes, get bed rest, and monitor body temperature twice daily." },
+            "cough": { specialist: "Pulmonologist / General Physician", advice: "Use warm steam inhalation, gargle with warm salt water, and avoid cold beverages." },
+            "cold": { specialist: "ENT Specialist / General Physician", advice: "Drink warm herbal infusions with honey, keep your chest warm, and use saline nasal drops." },
+            "headache": { specialist: "Neurologist / General Physician", advice: "Rest in a quiet, dark room, hydrate well, and take breaks from digital screens." },
+            "chest": { specialist: "Cardiologist", advice: "Avoid physical exertion, stay calm, and if pain intensifies or spreads, reach an emergency ER immediately." },
+            "stomach": { specialist: "Gastroenterologist", advice: "Stick to light, bland foods (toast, bananas, rice), avoid fried items, and sip ginger tea." },
+            "nausea": { specialist: "Gastroenterologist", advice: "Sip oral rehydration salts slowly and avoid lying flat immediately after meals." },
+            "rash": { specialist: "Dermatologist", advice: "Apply gentle moisturizers, do not scratch the affected skin, and wear loose cotton clothing." },
+            "joints": { specialist: "Orthopedic Surgeon", advice: "Apply a cold pack for acute swelling or warm compress for stiffness; avoid heavy lifting." },
+            "fatigue": { specialist: "General Physician", advice: "Ensure 7-9 hours of consistent sleep, check daily water intake, and consider a complete blood count test." }
+        };
+
+        function toggleChip(chip) {
+            const cb = chip.querySelector("input[type=checkbox]");
+            cb.checked = !cb.checked;
+            chip.classList.toggle("selected", cb.checked);
+
+            const count = document.querySelectorAll("#symptomGrid input:checked").length;
+            document.getElementById("selectedCountText").textContent = `${count} symptom${count === 1 ? '' : 's'} selected`;
+        }
+
+        function clearSymptoms() {
+            document.querySelectorAll("#symptomGrid .symptom-chip").forEach(chip => {
+                chip.classList.remove("selected");
+                chip.querySelector("input").checked = false;
+            });
+            document.getElementById("selectedCountText").textContent = "0 symptoms selected";
+            document.getElementById("resultPanel").style.display = "none";
+        }
+
+        function analyzeSymptoms() {
+            const selected = Array.from(document.querySelectorAll("#symptomGrid input:checked")).map(cb => cb.value);
+
+            if (selected.length === 0) {
+                alert("Please select at least one symptom to analyze.");
+                return;
+            }
+
+            const isEmergency = selected.includes("chest");
+            document.getElementById("emergencyWarningBox").style.display = isEmergency ? "block" : "none";
+
+            // Aggregate specialists
+            const specialists = [...new Set(selected.map(s => symptomSpecialistMap[s].specialist))];
+            const adviceList = selected.map(s => symptomSpecialistMap[s].advice);
+
+            const specContainer = document.getElementById("specialistRecommendations");
+            specContainer.innerHTML = specialists.map(spec => `
+                <div class="spec-item">
+                    <div>
+                        <div style="font-size:0.75rem;font-weight:700;color:var(--primary);text-transform:uppercase;margin-bottom:0.3rem">
+                            Recommended Field
+                        </div>
+                        <h4 style="font-size:1.15rem;color:var(--text-primary);margin-bottom:0.4rem">${spec}</h4>
+                        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.2rem">Qualified to diagnose and treat these specific symptom clusters.</p>
+                    </div>
+                    <a href="appointment.html" class="btn btn-primary btn-sm" style="width:100%">
+                        <i class="ri-calendar-line"></i> Book ${spec}
+                    </a>
+                </div>
+            `).join("");
+
+            const homeList = document.getElementById("homeCareList");
+            homeList.innerHTML = adviceList.map(adv => `<li>${adv}</li>`).join("");
+
+            const panel = document.getElementById("resultPanel");
+            panel.style.display = "block";
+            panel.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

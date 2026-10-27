@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocBook — Modern Healthcare & Doctor Appointment System</title>
+    <meta name="description" content="Find verified doctors, book appointments, check symptoms, locate nearby hospitals, consult AI health assistant, and order medicines online.">
+    
+    <!-- Remix Icon & Google Fonts -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Hero Section Custom Styles */
+        .hero-section {
+            background: radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.18) 0%, rgba(59, 130, 246, 0.05) 50%, transparent 80%),
+                        linear-gradient(180deg, #f0f7ff 0%, #f8fafc 100%);
+            padding: 5rem 1.5rem 4rem;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hero-grid {
+            max-width: 1240px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 3.5rem;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 1rem;
+            background: white;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: var(--radius-full);
+            margin-bottom: 1.2rem;
+        }
+
+        .hero-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.15;
+            color: var(--text-primary);
+            margin-bottom: 1.2rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-title span.gradient-text {
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            max-width: 580px;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* Demo Quick Access Bar */
+        .demo-bar {
+            background: white;
+            border: 1.5px dashed rgba(59, 130, 246, 0.4);
+            border-radius: var(--radius-lg);
+            padding: 1.1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .demo-bar-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .demo-bar-info i {
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+
+        .demo-bar-btns {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        /* Hero Right Graphic */
+        .hero-visual {
+            position: relative;
+        }
+
+        .hero-main-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 1.8rem;
+            box-shadow: 0 20px 40px -10px rgba(30, 58, 138, 0.15);
+            border: 1px solid var(--border-color);
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-doctor-spotlight {
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-doctor-img {
+            width: 75px;
+            height: 75px;
+            border-radius: var(--radius-md);
+            object-fit: cover;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        .float-badge {
+            position: absolute;
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 0.85rem 1.2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            z-index: 3;
+            animation: floatSlow 5s ease-in-out infinite alternate;
+        }
+
+        .float-badge-1 {
+            top: -20px;
+            right: -20px;
+        }
+
+        .float-badge-2 {
+            bottom: -25px;
+            left: -20px;
+            animation-delay: 2.5s;
+        }
+
+        .float-icon-box {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        @keyframes floatSlow {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-12px); }
+        }
+
+        /* Features Section */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 2.2rem;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .feature-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .feature-item h3 {
+            font-size: 1.28rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.6rem;
+        }
+
+        .feature-item p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.4rem;
+        }
+
+        .feature-link {
+            font-weight: 700;
+            font-size: 0.92rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Specialty Pills Filter */
+        .filter-scroll {
+            display: flex;
+            gap: 0.6rem;
+            overflow-x: auto;
+            padding-bottom: 0.8rem;
+            margin-bottom: 2.5rem;
+            justify-content: center;
+        }
+
+        .pill-btn {
+            padding: 0.55rem 1.25rem;
+            border-radius: var(--radius-full);
+            border: 1.5px solid var(--border-color);
+            background: white;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .pill-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .pill-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+
+        /* How it works */
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+            position: relative;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 2rem 1.6rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .step-num {
+            width: 44px;
+            height: 44px;
+            background: var(--primary-soft);
+            color: var(--primary-dark);
+            border: 2px solid var(--primary);
+            font-weight: 800;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.2rem;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 900px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .hero-actions {
+                justify-content: center;
+            }
+            .demo-bar {
+                justify-content: center;
+            }
+            .filter-scroll {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="site-navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="brand-logo">
+                <div class="brand-icon"><i class="ri-heart-pulse-fill"></i></div>
+                <span>Doc<span class="highlight">Book</span></span>
+            </a>
+
+            <button class="mobile-toggle" onclick="toggleMenu()" aria-label="Toggle navigation">
+                <i class="ri-menu-line"></i>
+            </button>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link active"><i class="ri-home-4-line"></i> Home</a></li>
+                <li><a href="appointment.html" class="nav-link"><i class="ri-calendar-check-line"></i> Appointments</a></li>
+                <li><a href="symptoms.html" class="nav-link"><i class="ri-stethoscope-line"></i> Symptoms</a></li>
+                <li><a href="hospitals.html" class="nav-link"><i class="ri-hospital-line"></i> Hospitals</a></li>
+                <li><a href="ai-help.html" class="nav-link"><i class="ri-robot-2-line"></i> AI Assistant</a></li>
+                <li><a href="ecart.html" class="nav-link"><i class="ri-shopping-bag-3-line"></i> Pharmacy</a></li>
+                <li><a href="about.html" class="nav-link"><i class="ri-information-line"></i> About</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="ecart.html" class="cart-link-btn" title="View Medicine Cart">
+                    <i class="ri-shopping-cart-line"></i>
+                    <span class="cart-badge" id="navCartCount" style="display:none">0</span>
+                </a>
+
+                <div id="navAuthContainer">
+                    <a href="login.html" class="nav-btn nav-btn-outline">Sign In</a>
+                    <a href="register.html" class="nav-btn nav-btn-solid">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-wrapper">
+
+        <!-- HERO SECTION -->
+        <section class="hero-section">
+            <div class="hero-grid">
+                <div>
+                    <div class="hero-badge">
+                        <i class="ri-shield-check-fill"></i> 100% Client-Side • Instant GitHub Ready
+                    </div>
+                    <h1 class="hero-title">
+                        Your Health, Reimagined. <br>
+                        <span class="gradient-text">Top Doctors at Your Fingertips.</span>
+                    </h1>
+                    <p class="hero-desc">
+                        Find verified specialist doctors, book instant appointments, check symptoms with AI, discover nearby hospitals, and order medicines delivered directly to your doorstep.
+                    </p>
+
+                    <div class="hero-actions">
+                        <a href="appointment.html" class="btn btn-primary btn-lg">
+                            <i class="ri-calendar-2-fill"></i> Book Appointment Now
+                        </a>
+                        <a href="ai-help.html" class="btn btn-secondary btn-lg">
+                            <i class="ri-robot-2-fill"></i> Ask AI Health Assistant
+                        </a>
+                    </div>
+
+                    <!-- 1-Click Demo Buttons -->
+                    <div class="demo-bar">
+                        <div class="demo-bar-info">
+                            <i class="ri-flashlight-line"></i>
+                            <span>1-Click Demo Login:</span>
+                        </div>
+                        <div class="demo-bar-btns">
+                            <button class="btn btn-sm btn-secondary" onclick="quickLogin('patient')">
+                                <i class="ri-user-smile-line"></i> Patient Demo
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="quickLogin('doctor')">
+                                <i class="ri-stethoscope-line"></i> Doctor Demo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Graphic Box -->
+                <div class="hero-visual">
+                    <div class="hero-main-card">
+                        <div class="hero-doctor-spotlight">
+                            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=300&q=80" alt="Doctor" class="hero-doctor-img">
+                            <div>
+                                <span class="badge badge-confirmed">● Available Today</span>
+                                <h3 style="margin-top:0.3rem">Dr. Sarah Jenkins</h3>
+                                <p style="color:var(--text-muted);font-size:0.88rem">Senior Cardiologist • Apollo Heart Care</p>
+                                <div style="display:flex;align-items:center;gap:0.3rem;color:#f59e0b;font-weight:700;font-size:0.88rem;margin-top:0.25rem">
+                                    <i class="ri-star-fill"></i> 4.9 (128 patient reviews)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background:var(--bg-page);border-radius:var(--radius-md);padding:1rem;margin-bottom:1.2rem">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.88rem">
+                                <span style="color:var(--text-muted)">Consultation Fee</span>
+                                <span style="font-weight:700;color:var(--primary)">₹800</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.88rem">
+                                <span style="color:var(--text-muted)">Available Slots</span>
+                                <span style="font-weight:700;color:var(--status-confirmed)">4 Slots Today</span>
+                            </div>
+                        </div>
+
+                        <a href="appointment.html?doc=1" class="btn btn-primary" style="width:100%">
+                            Select Time & Book
+                        </a>
+                    </div>
+
+                    <!-- Floating Badges -->
+                    <div class="float-badge float-badge-1">
+                        <div class="float-icon-box" style="background:#ecfdf5;color:#10b981">
+                            <i class="ri-check-double-line"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight:700;font-size:0.92rem">Instant Confirmation</div>
+                            <div style="font-size:0.78rem;color:var(--text-muted)">No waiting in clinic queues</div>
+                        </div>
+                    </div>
+
+                    <div class="float-badge float-badge-2">
+                        <div class="float-icon-box" style="background:#eff6ff;color:#3b82f6">
+                            <i class="ri-robot-2-line"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight:700;font-size:0.92rem">24/7 AI Health Chat</div>
+                            <div style="font-size:0.78rem;color:var(--text-muted)">Smart triage & advice</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SERVICES & FEATURES SECTION -->
+        <section class="page-container">
+            <div class="section-header">
+                <span class="section-badge">Everything You Need</span>
+                <h2 class="section-title">Complete Digital Healthcare Suite</h2>
+                <p class="section-desc">DocBook brings all modern health essentials into a single, intuitive platform.</p>
+            </div>
+
+            <div class="features-grid">
+                <!-- Card 1 -->
+                <div class="feature-item">
+                    <div>
+                        <div class="feature-icon" style="background:#eff6ff;color:#3b82f6">
+                            <i class="ri-calendar-event-line"></i>
+                        </div>
+                        <h3>Doctor Appointments</h3>
+                        <p>Browse specialist doctors by category, check their verified credentials, ratings, consultation fees, and book guaranteed slots.</p>
+                    </div>
+                    <a href="appointment.html" class="feature-link">Explore Doctors <i class="ri-arrow-right-line"></i></a>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="feature-item">
+                    <div>
+                        <div class="feature-icon" style="background:#ecfeff;color:#06b6d4">
+                            <i class="ri-robot-2-line"></i>
+                        </div>
+                        <h3>AI Health Assistant</h3>
+                        <p>Have medical doubts? Chat with our intelligent health bot for instantaneous symptom clarification, medicine dosage tips, and home remedies.</p>
+                    </div>
+                    <a href="ai-help.html" class="feature-link">Try AI Health Bot <i class="ri-arrow-right-line"></i></a>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="feature-item">
+                    <div>
+                        <div class="feature-icon" style="background:#fef3c7;color:#d97706">
+                            <i class="ri-stethoscope-fill"></i>
+                        </div>
+                        <h3>Smart Symptom Checker</h3>
+                        <p>Select your symptoms and let our diagnostic matrix recommend which specialist you need to visit, along with safety alerts.</p>
+                    </div>
+                    <a href="symptoms.html" class="feature-link">Check My Symptoms <i class="ri-arrow-right-line"></i></a>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="feature-item">
+                    <div>
+                        <div class="feature-icon" style="background:#fee2e2;color:#ef4444">
+                            <i class="ri-map-pin-2-fill"></i>
+                        </div>
+                        <h3>Hospital Radar & GPS</h3>
+                        <p>Locate verified emergency hospitals and clinics nearby using GPS mapping and OpenStreetMap live routing.</p>
+                    </div>
+                    <a href="hospitals.html" class="feature-link">Find Nearby Hospitals <i class="ri-arrow-right-line"></i></a>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="feature-item">
+                    <div>
+                        <div class="feature-icon" style="background:#ecfdf5;color:#10b981">
+                            <i class="ri-medicine-bottle-line"></i>
+                        </div>
+                        <h3>Online Pharmacy & E-Cart</h3>
+                        <p>Order certified medicines, fever tablets, vitamins, and healthcare essentials with seamless cart checkout and tracking.</p>
+                    </div>
+                    <a href="ecart.html" class="feature-link">Shop Medicines <i class="ri-arrow-right-line"></i></a>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="feature-item">
+                    <div>
+                        <div class="feature-icon" style="background:#f3e8ff;color:#8b5cf6">
+                            <i class="ri-dashboard-3-line"></i>
+                        </div>
+                        <h3>Doctor & Patient Portals</h3>
+                        <p>Seamless real-time dashboards for patients to view appointment history and for doctors to review, confirm, or reschedule appointments.</p>
+                    </div>
+                    <a href="user-dashboard.html" class="feature-link">View Dashboards <i class="ri-arrow-right-line"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURED SPECIALISTS SECTION -->
+        <section style="background:var(--bg-card-alt);padding:4.5rem 1.5rem">
+            <div class="page-container" style="padding:0">
+                <div class="section-header">
+                    <span class="section-badge">Verified Professionals</span>
+                    <h2 class="section-title">Meet Our Top Medical Specialists</h2>
+                    <p class="section-desc">Select a specialty to filter doctors or book an appointment directly.</p>
+                </div>
+
+                <!-- Specialty Filter -->
+                <div class="filter-scroll" id="specialtyFilterBar">
+                    <button class="pill-btn active" onclick="filterDoctors('All')">All Specialists</button>
+                    <button class="pill-btn" onclick="filterDoctors('Cardiologist')">Cardiology</button>
+                    <button class="pill-btn" onclick="filterDoctors('General Physician')">General Medicine</button>
+                    <button class="pill-btn" onclick="filterDoctors('Dermatologist')">Dermatology</button>
+                    <button class="pill-btn" onclick="filterDoctors('Neurologist')">Neurology</button>
+                    <button class="pill-btn" onclick="filterDoctors('Pediatrician')">Pediatrics</button>
+                    <button class="pill-btn" onclick="filterDoctors('Orthopedic')">Orthopedics</button>
+                </div>
+
+                <!-- Doctors Grid -->
+                <div class="grid-3" id="homeDoctorGrid">
+                    <!-- Populated dynamically by JS -->
+                </div>
+
+                <div style="text-align:center;margin-top:3rem">
+                    <a href="appointment.html" class="btn btn-primary btn-lg">
+                        <i class="ri-team-line"></i> View All Available Doctors & Schedule
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS SECTION -->
+        <section class="page-container">
+            <div class="section-header">
+                <span class="section-badge">Simple 3-Step Process</span>
+                <h2 class="section-title">How DocBook Works</h2>
+                <p class="section-desc">Getting the medical consultation you need takes less than 2 minutes.</p>
+            </div>
+
+            <div class="steps-container">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <h3 style="margin-bottom:0.6rem">Choose a Specialist</h3>
+                    <p style="color:var(--text-secondary);font-size:0.92rem">Search by specialty, experience, hospital affiliation, and check verified patient ratings.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <h3 style="margin-bottom:0.6rem">Select Date & Slot</h3>
+                    <p style="color:var(--text-secondary);font-size:0.92rem">Pick your convenient consultation date and morning or afternoon time slot with no queue.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <h3 style="margin-bottom:0.6rem">Get Instant Confirmation</h3>
+                    <p style="color:var(--text-secondary);font-size:0.92rem">Receive your confirmed appointment badge immediately on your live patient portal dashboard.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3><i class="ri-heart-pulse-fill" style="color:#38bdf8"></i> DocBook</h3>
+                <p>DocBook is a client-side modern healthcare platform enabling rapid appointment scheduling, symptom checking, hospital locator services, and e-pharmacy orders.</p>
+                <div class="emergency-hotline-box">
+                    <h5>🚨 24/7 Medical Emergency Helpline</h5>
+                    <p class="phone">108 / 112</p>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="appointment.html">Book Appointments</a></li>
+                    <li><a href="symptoms.html">Symptom Checker</a></li>
+                    <li><a href="hospitals.html">Hospital Finder</a></li>
+                    <li><a href="ecart.html">Pharmacy Store</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Portals</h4>
+                <ul class="footer-links">
+                    <li><a href="login.html">Sign In</a></li>
+                    <li><a href="register.html">Create Account</a></li>
+                    <li><a href="user-dashboard.html">Patient Dashboard</a></li>
+                    <li><a href="doctor-dashboard.html">Doctor Dashboard</a></li>
+                    <li><a href="about.html">About DocBook</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>GitHub Ready</h4>
+                <p style="font-size:0.88rem;line-height:1.6;margin-bottom:1rem">
+                    This project is 100% frontend with pure client-side storage. Upload to GitHub and enable GitHub Pages for instant live hosting!
+                </p>
+                <button class="btn btn-light btn-sm" onclick="resetDemoData()">
+                    <i class="ri-refresh-line"></i> Reset Demo Data
+                </button>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div>© 2026 DocBook Healthcare System. Open Source & Frontend Only.</div>
+            <div style="display:flex;gap:1.5rem">
+                <a href="about.html" style="color:#94a3b8">Privacy Policy</a>
+                <a href="about.html" style="color:#94a3b8">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Storage Script -->
+    <script src="docbook-storage.js"></script>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("show");
+        }
+
+        // Render Doctors on Home Page
+        function renderHomeDoctors(category = "All") {
+            const doctors = DocBookDB.getDoctors();
+            const container = document.getElementById("homeDoctorGrid");
+
+            const filtered = category === "All" 
+                ? doctors 
+                : doctors.filter(d => d.specialist.toLowerCase() === category.toLowerCase());
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:2rem">No doctors registered under ${category} yet.</p>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(doc => `
+                <div class="doctor-card">
+                    <div class="doctor-card-header">
+                        <div class="doctor-avatar-wrap">
+                            <img src="${doc.photo}" alt="${doc.name}" onerror="this.src='https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=300&q=80'">
+                            <div class="online-indicator" title="Available for appointments"></div>
+                        </div>
+                        <div class="doctor-meta">
+                            <h3>${doc.name}</h3>
+                            <span class="doctor-specialty-badge">${doc.specialist}</span>
+                            <div class="doctor-rating">
+                                <i class="ri-star-fill star-icon"></i>
+                                <span>${doc.rating || '4.9'}</span>
+                                <span style="color:var(--text-light);font-size:0.8rem">(${doc.reviewsCount || 100}+ reviews)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="doctor-body">
+                        <div class="doctor-info-row">
+                            <span class="doctor-info-label"><i class="ri-hospital-line"></i> Hospital</span>
+                            <span class="doctor-info-val">${doc.hospital || 'Metro Clinic'}</span>
+                        </div>
+                        <div class="doctor-info-row">
+                            <span class="doctor-info-label"><i class="ri-time-line"></i> Experience</span>
+                            <span class="doctor-info-val">${doc.experience} Years</span>
+                        </div>
+                        <div class="doctor-info-row">
+                            <span class="doctor-info-label"><i class="ri-money-rupee-circle-line"></i> Fee</span>
+                            <span class="doctor-fee">₹${doc.fee || 600}</span>
+                        </div>
+                    </div>
+
+                    <div class="doctor-actions">
+                        <a href="appointment.html?doc=${doc.id}" class="btn btn-primary">
+                            <i class="ri-calendar-check-line"></i> Book Slot
+                        </a>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function filterDoctors(category) {
+            // Update active pill button
+            document.querySelectorAll("#specialtyFilterBar .pill-btn").forEach(btn => {
+                btn.classList.toggle("active", btn.textContent.includes(category) || (category === "All" && btn.textContent.includes("All")));
+            });
+            renderHomeDoctors(category);
+        }
+
+        // Quick 1-click Demo Login
+        function quickLogin(role) {
+            if (role === "patient") {
+                const res = DocBookDB.login("patient@docbook.com", "patient123");
+                if (res.success) {
+                    window.location.href = "user-dashboard.html";
+                }
+            } else if (role === "doctor") {
+                const res = DocBookDB.login("doctor@docbook.com", "doctor123");
+                if (res.success) {
+                    window.location.href = "doctor-dashboard.html";
+                }
+            }
+        }
+
+        function resetDemoData() {
+            if (confirm("Reset all appointments and accounts to fresh demo state?")) {
+                DocBookDB.resetDemoData();
+                alert("Demo data reset successfully!");
+                location.reload();
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener("DOMContentLoaded", () => {
+            renderHomeDoctors();
+        });
+    </script>
+</body>
+</html>

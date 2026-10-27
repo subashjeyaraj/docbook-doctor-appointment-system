@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Portal Dashboard — DocBook</title>
+    <meta name="description" content="Manage patient appointment schedules, approvals, and clinical consultations.">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .dashboard-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            border-radius: var(--radius-xl);
+            margin-bottom: 2.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.4rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+        }
+
+        .stat-val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .dashboard-table-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 1.8rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-tab {
+            padding: 0.45rem 1rem;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-color);
+            background: var(--bg-card-alt);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .doctor-appt-item {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .doctor-appt-item:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .appt-patient-info h4 {
+            font-size: 1.15rem;
+            color: var(--text-primary);
+            margin-bottom: 0.4rem;
+        }
+
+        .appt-patient-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        .appt-patient-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .appt-actions {
+            display: flex;
+            gap: 0.6rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="site-navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="brand-logo">
+                <div class="brand-icon"><i class="ri-heart-pulse-fill"></i></div>
+                <span>Doc<span class="highlight">Book</span></span>
+            </a>
+
+            <button class="mobile-toggle" onclick="toggleMenu()" aria-label="Toggle navigation">
+                <i class="ri-menu-line"></i>
+            </button>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link"><i class="ri-home-4-line"></i> Home</a></li>
+                <li><a href="appointment.html" class="nav-link"><i class="ri-calendar-check-line"></i> Appointments</a></li>
+                <li><a href="doctor-dashboard.html" class="nav-link active"><i class="ri-dashboard-line"></i> Doctor Portal</a></li>
+                <li><a href="hospitals.html" class="nav-link"><i class="ri-hospital-line"></i> Hospitals</a></li>
+                <li><a href="ai-help.html" class="nav-link"><i class="ri-robot-2-line"></i> AI Assistant</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <div id="navAuthContainer"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container">
+
+        <!-- DASHBOARD HEADER -->
+        <div class="dashboard-header">
+            <div>
+                <span class="badge" style="background:rgba(255,255,255,0.2);color:white;margin-bottom:0.6rem">
+                    🩺 Doctor Management Portal
+                </span>
+                <h1 id="doctorWelcome">Welcome Doctor</h1>
+                <p id="doctorSpecialtySub" style="opacity:0.9;font-size:0.95rem">Specialist Portal • DocBook Healthcare</p>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:0.8rem">
+                <button class="btn btn-light" onclick="loadDoctorAppointments()">
+                    <i class="ri-refresh-line"></i> Refresh
+                </button>
+                <button class="btn btn-light" onclick="DocBookDB.logout()">
+                    <i class="ri-logout-box-r-line"></i> Sign Out
+                </button>
+            </div>
+        </div>
+
+        <!-- STATS KPI GRID -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#eff6ff;color:#3b82f6">
+                    <i class="ri-calendar-2-line"></i>
+                </div>
+                <div>
+                    <div class="stat-val" id="statTotal">0</div>
+                    <div class="stat-label">Total Appointments</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#fef3c7;color:#d97706">
+                    <i class="ri-time-line"></i>
+                </div>
+                <div>
+                    <div class="stat-val" id="statPending">0</div>
+                    <div class="stat-label">Pending Approval</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#ecfdf5;color:#10b981">
+                    <i class="ri-checkbox-circle-line"></i>
+                </div>
+                <div>
+                    <div class="stat-val" id="statConfirmed">0</div>
+                    <div class="stat-label">Confirmed Sessions</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#fee2e2;color:#ef4444">
+                    <i class="ri-close-circle-line"></i>
+                </div>
+                <div>
+                    <div class="stat-val" id="statCancelled">0</div>
+                    <div class="stat-label">Cancelled / Declined</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- APPOINTMENTS LIST CARD -->
+        <div class="dashboard-table-card">
+            <div class="table-controls">
+                <div>
+                    <h3 style="font-size:1.3rem;font-weight:700">Patient Consultation Requests</h3>
+                    <p style="color:var(--text-muted);font-size:0.88rem">Review incoming patient bookings and manage their appointment status</p>
+                </div>
+
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="setFilter('All', this)">All</button>
+                    <button class="filter-tab" onclick="setFilter('Pending', this)">Pending</button>
+                    <button class="filter-tab" onclick="setFilter('Confirmed', this)">Confirmed</button>
+                    <button class="filter-tab" onclick="setFilter('Cancelled', this)">Cancelled</button>
+                </div>
+            </div>
+
+            <div id="doctorApptsContainer">
+                <p style="text-align:center;padding:2rem;color:var(--text-muted)">Loading doctor appointments...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- TOAST -->
+    <div id="toastMessage" class="toast-msg"></div>
+
+    <!-- Storage Script -->
+    <script src="docbook-storage.js"></script>
+
+    <script>
+        let currentFilter = "All";
+        let activeDoctor = null;
+
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("show");
+        }
+
+        function showToast(message, type = "success") {
+            const toast = document.getElementById("toastMessage");
+            toast.textContent = message;
+            toast.className = `toast-msg show toast-${type}`;
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3500);
+        }
+
+        // Authenticate & Verify Doctor
+        function checkDoctorAuth() {
+            let user = DocBookDB.getCurrentUser();
+
+            // If not logged in as doctor, provide a graceful fallback or auto-login as demo doctor
+            if (!user || user.role !== "doctor") {
+                const autoDemo = confirm("You are currently not signed in as a Doctor. Would you like to enter as Demo Doctor (Dr. Sarah Jenkins)?");
+                if (autoDemo) {
+                    DocBookDB.login("doctor@docbook.com", "doctor123");
+                    user = DocBookDB.getCurrentUser();
+                } else {
+                    window.location.href = "login.html";
+                    return;
+                }
+            }
+
+            activeDoctor = user;
+            document.getElementById("doctorWelcome").textContent = `Welcome, ${user.name}`;
+            document.getElementById("doctorSpecialtySub").textContent = `${user.specialist || 'Medical Specialist'} • DocBook Clinical Portal`;
+
+            loadDoctorAppointments();
+        }
+
+        // Load Appointments
+        function loadDoctorAppointments() {
+            if (!activeDoctor) return;
+
+            // Find all appointments matching this doctor ID, or if demo, matching doctor_name or doc ID
+            const allAppts = DocBookDB.getAppointments();
+            const docId = activeDoctor.doctorId || activeDoctor.id;
+
+            // Match by ID or by doctor name
+            let doctorAppts = allAppts.filter(a => {
+                return (Number(a.doctor_id) === Number(docId)) || 
+                       (a.doctor_name && a.doctor_name.toLowerCase().includes(activeDoctor.name.toLowerCase()));
+            });
+
+            // If none found for this doctor, fallback to showing all appointments for demonstration
+            if (doctorAppts.length === 0) {
+                doctorAppts = allAppts;
+            }
+
+            // Update KPI stats
+            const total = doctorAppts.length;
+            const pending = doctorAppts.filter(a => a.status === "Pending").length;
+            const confirmed = doctorAppts.filter(a => a.status === "Confirmed").length;
+            const cancelled = doctorAppts.filter(a => a.status === "Cancelled").length;
+
+            document.getElementById("statTotal").textContent = total;
+            document.getElementById("statPending").textContent = pending;
+            document.getElementById("statConfirmed").textContent = confirmed;
+            document.getElementById("statCancelled").textContent = cancelled;
+
+            // Filter
+            let displayList = doctorAppts;
+            if (currentFilter !== "All") {
+                displayList = doctorAppts.filter(a => a.status.toLowerCase() === currentFilter.toLowerCase());
+            }
+
+            const container = document.getElementById("doctorApptsContainer");
+
+            if (displayList.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:3rem;color:var(--text-muted)">
+                        <i class="ri-calendar-check-line" style="font-size:2.5rem;color:var(--text-light)"></i>
+                        <p style="margin-top:0.8rem">No ${currentFilter !== 'All' ? currentFilter : ''} appointments found in your schedule.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = displayList.map(appt => {
+                const statusBadge = appt.status === "Confirmed" ? "badge-confirmed" : (appt.status === "Cancelled" ? "badge-cancelled" : "badge-pending");
+
+                return `
+                    <div class="doctor-appt-item">
+                        <div class="appt-patient-info">
+                            <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.4rem">
+                                <h4>${appt.patient_name}</h4>
+                                <span class="badge ${statusBadge}">● ${appt.status}</span>
+                            </div>
+                            <div class="appt-patient-meta">
+                                <span><i class="ri-mail-line" style="color:var(--primary)"></i> ${appt.patient_email}</span>
+                                <span><i class="ri-phone-line" style="color:var(--primary)"></i> ${appt.patient_mobile}</span>
+                                <span><i class="ri-calendar-line" style="color:var(--primary)"></i> ${appt.appt_date}</span>
+                                <span><i class="ri-time-line" style="color:var(--primary)"></i> ${appt.appt_time || '10:00 AM'}</span>
+                            </div>
+                            <div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.5rem">
+                                <b>Reason:</b> ${appt.reason || 'General Medical Consultation'}
+                            </div>
+                        </div>
+
+                        <div class="appt-actions">
+                            ${appt.status === "Pending" ? `
+                                <button class="btn btn-sm btn-success" onclick="updateStatus(${appt.id}, 'Confirmed')">
+                                    <i class="ri-check-line"></i> Confirm
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="updateStatus(${appt.id}, 'Cancelled')">
+                                    <i class="ri-close-line"></i> Decline
+                                </button>
+                            ` : (appt.status === "Confirmed" ? `
+                                <button class="btn btn-sm btn-danger" onclick="updateStatus(${appt.id}, 'Cancelled')">
+                                    <i class="ri-close-line"></i> Cancel
+                                </button>
+                            ` : `
+                                <button class="btn btn-sm btn-secondary" onclick="updateStatus(${appt.id}, 'Pending')">
+                                    <i class="ri-refresh-line"></i> Reopen
+                                </button>
+                            `)}
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function setFilter(status, btn) {
+            currentFilter = status;
+            document.querySelectorAll(".filter-tabs .filter-tab").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            loadDoctorAppointments();
+        }
+
+        function updateStatus(apptId, newStatus) {
+            const res = DocBookDB.updateAppointmentStatus(apptId, newStatus);
+            if (res.success) {
+                showToast(`Appointment status changed to ${newStatus}.`, "success");
+                loadDoctorAppointments();
+            } else {
+                showToast(res.message, "error");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            checkDoctorAuth();
+        });
+    </script>
+</body>
+</html>

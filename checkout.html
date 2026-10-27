@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout — DocBook Pharmacy</title>
+    <meta name="description" content="Complete your pharmacy order delivery and payment.">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .checkout-layout {
+            max-width: 980px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.25fr 0.85fr;
+            gap: 2.2rem;
+            align-items: start;
+        }
+
+        .checkout-box {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 2.2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .payment-opt-card {
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .payment-opt-card:hover {
+            border-color: var(--primary);
+            background: var(--bg-card-alt);
+        }
+
+        .payment-opt-card.active {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .payment-opt-card input {
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+        }
+
+        @media (max-width: 860px) {
+            .checkout-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="site-navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="brand-logo">
+                <div class="brand-icon"><i class="ri-heart-pulse-fill"></i></div>
+                <span>Doc<span class="highlight">Book</span></span>
+            </a>
+
+            <div class="nav-actions">
+                <a href="ecart.html" class="btn btn-sm btn-secondary">
+                    <i class="ri-arrow-left-line"></i> Back to Cart
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container">
+
+        <div class="section-header" style="text-align:left;margin-bottom:2rem">
+            <span class="section-badge">Express Doorstep Delivery</span>
+            <h1 class="section-title">Confirm Delivery & Payment</h1>
+            <p class="section-desc">Provide your shipping address and choose your preferred payment option.</p>
+        </div>
+
+        <div class="checkout-layout">
+            
+            <!-- LEFT COLUMN: ADDRESS & PAYMENT -->
+            <div class="checkout-box">
+                <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:1.2rem">
+                    <i class="ri-map-pin-line" style="color:var(--primary)"></i> 1. Delivery Details
+                </h3>
+
+                <form id="checkoutForm" onsubmit="handlePlaceOrder(event)">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                        <div class="form-group">
+                            <label class="form-label">Recipient Name *</label>
+                            <input type="text" id="custName" class="form-control" placeholder="Full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Contact Phone *</label>
+                            <input type="tel" id="custPhone" class="form-control" placeholder="+91 98765 43210" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Full Street Address *</label>
+                        <textarea id="custAddress" class="form-control" rows="2" placeholder="House/Flat number, Street name, Landmark" required></textarea>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                        <div class="form-group">
+                            <label class="form-label">City *</label>
+                            <input type="text" id="custCity" class="form-control" placeholder="e.g. Chennai" value="Chennai" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Pincode *</label>
+                            <input type="text" id="custPin" class="form-control" placeholder="e.g. 600001" value="600001" required>
+                        </div>
+                    </div>
+
+                    <h3 style="font-size:1.25rem;font-weight:700;margin:1.8rem 0 1rem">
+                        <i class="ri-secure-payment-line" style="color:var(--primary)"></i> 2. Payment Method
+                    </h3>
+
+                    <label class="payment-opt-card active" onclick="selectPayment(this, 'Cash on Delivery')">
+                        <input type="radio" name="paymentMethod" value="Cash on Delivery" checked>
+                        <div>
+                            <div style="font-weight:700;font-size:0.95rem">💵 Cash on Delivery (COD)</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted)">Pay safely when medicines arrive at your doorstep</div>
+                        </div>
+                    </label>
+
+                    <label class="payment-opt-card" onclick="selectPayment(this, 'Instant UPI Demo')">
+                        <input type="radio" name="paymentMethod" value="Instant UPI Demo">
+                        <div>
+                            <div style="font-weight:700;font-size:0.95rem">⚡ Instant UPI / QR Code (Demo)</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted)">Simulated Google Pay / PhonePe / Paytm</div>
+                        </div>
+                    </label>
+
+                    <label class="payment-opt-card" onclick="selectPayment(this, 'Debit/Credit Card Demo')">
+                        <input type="radio" name="paymentMethod" value="Debit/Credit Card Demo">
+                        <div>
+                            <div style="font-weight:700;font-size:0.95rem">💳 Credit / Debit Card (Demo)</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted)">Simulated Visa, Mastercard, RuPay processing</div>
+                        </div>
+                    </label>
+
+                    <button type="submit" class="btn btn-primary btn-lg" style="width:100%;margin-top:1.8rem">
+                        <i class="ri-check-double-line"></i> Place Confirmed Order
+                    </button>
+                </form>
+            </div>
+
+            <!-- RIGHT COLUMN: ORDER SUMMARY -->
+            <div class="checkout-box" style="position:sticky;top:5.5rem">
+                <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:1.2rem">Order Summary</h3>
+
+                <div id="checkoutItemsList" style="max-height:280px;overflow-y:auto;margin-bottom:1.2rem">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div style="border-top:1px dashed var(--border-color);padding-top:1rem">
+                    <div style="display:flex;justify-content:space-between;font-size:0.88rem;color:var(--text-muted);margin-bottom:0.4rem">
+                        <span>Items Subtotal</span>
+                        <span id="coSubtotal">₹0</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.88rem;color:var(--text-muted);margin-bottom:0.4rem">
+                        <span>Standard Delivery</span>
+                        <span style="color:var(--status-confirmed);font-weight:700">FREE</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:1.2rem;font-weight:800;color:var(--text-primary);margin-top:0.8rem">
+                        <span>Total Amount</span>
+                        <span id="coTotal" style="color:var(--primary)">₹0</span>
+                    </div>
+                </div>
+
+                <div style="background:var(--bg-card-alt);border-radius:var(--radius-md);padding:0.9rem;margin-top:1.4rem;font-size:0.82rem;color:var(--text-muted);display:flex;gap:0.5rem;align-items:center">
+                    <i class="ri-shield-check-fill" style="color:var(--status-confirmed);font-size:1.3rem"></i>
+                    <span>100% genuine medical supplies backed by verified pharmacy partners.</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Storage Script -->
+    <script src="docbook-storage.js"></script>
+
+    <script>
+        let selectedPaymentMethod = "Cash on Delivery";
+        let cartItems = [];
+
+        function selectPayment(labelEl, method) {
+            document.querySelectorAll(".payment-opt-card").forEach(el => el.classList.remove("active"));
+            labelEl.classList.add("active");
+            selectedPaymentMethod = method;
+        }
+
+        function loadCheckoutData() {
+            cartItems = DocBookDB.getCart();
+
+            if (cartItems.length === 0) {
+                alert("Your cart is empty. Redirecting to store...");
+                window.location.href = "ecart.html";
+                return;
+            }
+
+            // Autofill user details
+            const user = DocBookDB.getCurrentUser();
+            if (user) {
+                document.getElementById("custName").value = user.name || "";
+                document.getElementById("custPhone").value = user.mobile || "";
+            }
+
+            const container = document.getElementById("checkoutItemsList");
+            let subtotal = 0;
+
+            container.innerHTML = cartItems.map(item => {
+                const total = item.price * item.quantity;
+                subtotal += total;
+                return `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--border-color);font-size:0.9rem">
+                        <div>
+                            <div style="font-weight:600;color:var(--text-primary)">${item.name}</div>
+                            <div style="font-size:0.78rem;color:var(--text-muted)">Qty: ${item.quantity} × ₹${item.price}</div>
+                        </div>
+                        <div style="font-weight:700">₹${total}</div>
+                    </div>
+                `;
+            }).join("");
+
+            document.getElementById("coSubtotal").textContent = `₹${subtotal}`;
+            document.getElementById("coTotal").textContent = `₹${subtotal}`;
+        }
+
+        function handlePlaceOrder(e) {
+            e.preventDefault();
+
+            const name = document.getElementById("custName").value.trim();
+            const phone = document.getElementById("custPhone").value.trim();
+            const address = document.getElementById("custAddress").value.trim();
+            const city = document.getElementById("custCity").value.trim();
+            const pin = document.getElementById("custPin").value.trim();
+
+            const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            const order = DocBookDB.saveOrder({
+                customerName: name,
+                customerPhone: phone,
+                shippingAddress: `${address}, ${city} - ${pin}`,
+                paymentMethod: selectedPaymentMethod,
+                items: cartItems,
+                total: total
+            });
+
+            // Store last order in session for success display
+            sessionStorage.setItem("last_order_details", JSON.stringify(order));
+
+            window.location.href = "success.html";
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadCheckoutData();
+        });
+    </script>
+</body>
+</html>

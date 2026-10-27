@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Health Assistant — DocBook</title>
+    <meta name="description" content="24/7 AI-powered medical triage, symptom advice, first-aid help, and specialist recommendations.">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .ai-chat-layout {
+            max-width: 860px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 720px;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 1.2rem 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-bot-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
+
+        .bot-avatar-badge {
+            width: 46px;
+            height: 46px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .chat-disclaimer-banner {
+            background: #fffbeb;
+            border-bottom: 1px solid #fef3c7;
+            padding: 0.65rem 1.2rem;
+            font-size: 0.8rem;
+            color: #92400e;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chat-messages-area {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            background: #f8fafc;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 1rem 1.3rem;
+            border-radius: var(--radius-lg);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bubble-bot {
+            align-self: flex-start;
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .bubble-bot ul {
+            margin: 0.5rem 0 0.5rem 1.2rem;
+        }
+
+        .bubble-bot li {
+            margin-bottom: 0.3rem;
+        }
+
+        .bubble-user {
+            align-self: flex-end;
+            background: var(--gradient-accent);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+
+        .bubble-time {
+            font-size: 0.72rem;
+            opacity: 0.65;
+            margin-top: 0.4rem;
+            text-align: right;
+        }
+
+        .emergency-alert-card {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            color: #991b1b;
+            padding: 0.9rem;
+            border-radius: var(--radius-sm);
+            margin: 0.6rem 0;
+            font-weight: 600;
+        }
+
+        /* Quick prompt pills */
+        .prompt-pills-row {
+            padding: 0.6rem 1.2rem;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .prompt-pill {
+            padding: 0.35rem 0.85rem;
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-full);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .prompt-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        /* Input Bar */
+        .chat-input-bar {
+            padding: 1rem 1.2rem;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .chat-input-field {
+            flex: 1;
+            padding: 0.85rem 1.2rem;
+            border-radius: var(--radius-full);
+            border: 1.5px solid var(--border-color);
+            outline: none;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .chat-input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Typing indicator */
+        .typing-dots {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+            padding: 0.6rem 1rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            align-self: flex-start;
+        }
+
+        .typing-dots span {
+            width: 7px;
+            height: 7px;
+            background: var(--text-light);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="site-navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="brand-logo">
+                <div class="brand-icon"><i class="ri-heart-pulse-fill"></i></div>
+                <span>Doc<span class="highlight">Book</span></span>
+            </a>
+
+            <button class="mobile-toggle" onclick="toggleMenu()" aria-label="Toggle navigation">
+                <i class="ri-menu-line"></i>
+            </button>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link"><i class="ri-home-4-line"></i> Home</a></li>
+                <li><a href="appointment.html" class="nav-link"><i class="ri-calendar-check-line"></i> Appointments</a></li>
+                <li><a href="symptoms.html" class="nav-link"><i class="ri-stethoscope-line"></i> Symptoms</a></li>
+                <li><a href="hospitals.html" class="nav-link"><i class="ri-hospital-line"></i> Hospitals</a></li>
+                <li><a href="ai-help.html" class="nav-link active"><i class="ri-robot-2-line"></i> AI Assistant</a></li>
+                <li><a href="ecart.html" class="nav-link"><i class="ri-shopping-bag-3-line"></i> Pharmacy</a></li>
+                <li><a href="about.html" class="nav-link"><i class="ri-information-line"></i> About</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="ecart.html" class="cart-link-btn" title="View Medicine Cart">
+                    <i class="ri-shopping-cart-line"></i>
+                    <span class="cart-badge" id="navCartCount" style="display:none">0</span>
+                </a>
+
+                <div id="navAuthContainer">
+                    <a href="login.html" class="nav-btn nav-btn-outline">Sign In</a>
+                    <a href="register.html" class="nav-btn nav-btn-solid">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container" style="padding-top:2rem">
+        
+        <div class="section-header" style="margin-bottom:1.8rem">
+            <span class="section-badge">Virtual Medical Intelligence</span>
+            <h1 class="section-title">DocBot 24/7 AI Health Assistant</h1>
+            <p class="section-desc">Ask your health doubts, understand symptoms, get home remedies and find recommended specialists.</p>
+        </div>
+
+        <div class="ai-chat-layout">
+            
+            <!-- Chat Top Header -->
+            <div class="chat-header">
+                <div class="chat-bot-meta">
+                    <div class="bot-avatar-badge">🤖</div>
+                    <div>
+                        <div style="font-weight:700;font-size:1.1rem">DocBot AI Consultant</div>
+                        <div style="font-size:0.8rem;opacity:0.85">● Online & Ready to help</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-sm btn-light" onclick="clearChat()">
+                    <i class="ri-delete-bin-line"></i> Clear
+                </button>
+            </div>
+
+            <!-- Disclaimer Banner -->
+            <div class="chat-disclaimer-banner">
+                <i class="ri-alert-line"></i>
+                <span><b>Medical Notice:</b> DocBot provides informational support and is not a substitute for clinical diagnosis. In emergencies, call <b>108 / 112</b> immediately.</span>
+            </div>
+
+            <!-- Messages Window -->
+            <div class="chat-messages-area" id="chatMessages">
+                <div class="chat-bubble bubble-bot">
+                    Hello! 👋 I am <b>DocBot</b>, your virtual AI healthcare guide. How can I help you today? You can ask me about:
+                    <ul>
+                        <li>Understanding common symptoms (fever, cough, stomach pain, migraines)</li>
+                        <li>Which doctor specialist you should consult</li>
+                        <li>Safe home remedies and over-the-counter medicine advice</li>
+                        <li>First aid steps and healthy diet suggestions</li>
+                    </ul>
+                    <div class="bubble-time">Just now</div>
+                </div>
+            </div>
+
+            <!-- Suggested Quick Questions -->
+            <div class="prompt-pills-row">
+                <button class="prompt-pill" onclick="sendPrompt('I have a mild fever and headache. What should I do?')">🤒 Fever & Headache relief</button>
+                <button class="prompt-pill" onclick="sendPrompt('What causes sudden chest tightness or pain?')">🫀 Chest pain symptoms</button>
+                <button class="prompt-pill" onclick="sendPrompt('What are natural home remedies for cold and sore throat?')">🍵 Cold & Sore throat remedies</button>
+                <button class="prompt-pill" onclick="sendPrompt('How can I manage high blood pressure with diet?')">🥗 High Blood Pressure tips</button>
+                <button class="prompt-pill" onclick="sendPrompt('First aid steps for minor kitchen burns?')">🩹 First aid for minor burns</button>
+            </div>
+
+            <!-- Chat Input Area -->
+            <form class="chat-input-bar" onsubmit="handleChatSubmit(event)">
+                <input type="text" id="userInput" class="chat-input-field" placeholder="Type your health question or symptom..." autocomplete="off" required>
+                <button type="submit" class="btn btn-primary" style="border-radius:var(--radius-full);padding:0.85rem 1.6rem">
+                    <i class="ri-send-plane-fill"></i> Send
+                </button>
+            </form>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3><i class="ri-heart-pulse-fill" style="color:#38bdf8"></i> DocBook</h3>
+                <p>DocBot AI provides clinical knowledge triage to help patients make informed decisions.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Navigation</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="appointment.html">Book Doctors</a></li>
+                    <li><a href="symptoms.html">Symptom Matrix</a></li>
+                    <li><a href="hospitals.html">Emergency Hospitals</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Pharmacy</h4>
+                <ul class="footer-links">
+                    <li><a href="ecart.html">E-Cart Medicines</a></li>
+                    <li><a href="about.html">About Team</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <div class="emergency-hotline-box">
+                    <h5>Emergency Services</h5>
+                    <p class="phone">108 / 112</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>© 2026 DocBook Healthcare System. Open Source & Frontend Only.</div>
+        </div>
+    </footer>
+
+    <!-- Storage Script -->
+    <script src="docbook-storage.js"></script>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("show");
+        }
+
+        // Smart Knowledge Engine
+        function generateAIResponse(query) {
+            const q = query.toLowerCase();
+
+            // Emergency Triggers
+            if (q.includes("chest pain") || q.includes("heart attack") || q.includes("can't breathe") || q.includes("cannot breathe") || q.includes("shortness of breath") || q.includes("unconscious") || q.includes("stroke") || q.includes("paralysis")) {
+                return `
+                    <div class="emergency-alert-card">
+                        ⚠️ URGENT MEDICAL WARNING:
+                        The symptoms you described can indicate a serious cardiovascular or respiratory emergency.
+                    </div>
+                    <b>Immediate Recommended Actions:</b>
+                    <ul>
+                        <li>Call emergency services immediately at <b>108 or 112</b> or have someone drive you to the nearest emergency hospital.</li>
+                        <li>Rest in a comfortable, seated upright position and loosen any tight clothing.</li>
+                        <li>Do not engage in strenuous physical activity.</li>
+                    </ul>
+                    <div style="margin-top:0.8rem">
+                        <a href="hospitals.html" class="btn btn-sm btn-danger">📍 Find Nearest Emergency Hospitals Now</a>
+                    </div>
+                `;
+            }
+
+            // Fever & Headache
+            if (q.includes("fever") || q.includes("temperature") || q.includes("headache") || q.includes("migraine")) {
+                return `
+                    <b>Guidance for Fever & Headache:</b>
+                    <p>Fever is the body's natural defense mechanism fighting off viral or bacterial infections.</p>
+                    <ul>
+                        <li><b>Hydration:</b> Drink plenty of fluids (water, coconut water, warm broths) to prevent dehydration.</li>
+                        <li><b>Rest:</b> Get at least 8 hours of sleep in a well-ventilated, comfortable room.</li>
+                        <li><b>Temperature control:</b> Use a cool, damp compress on the forehead. OTC Paracetamol (500mg) can help alleviate fever and headaches if not contraindicated.</li>
+                        <li><b>Warning signs:</b> If fever exceeds 102°F (38.9°C), lasts more than 3 days, or is accompanied by stiff neck, consult a physician promptly.</li>
+                    </ul>
+                    <div style="margin-top:0.8rem">
+                        <b>Suggested Specialist:</b> <a href="appointment.html?doc=2" style="font-weight:700">Dr. Rajesh Kumar (General Physician)</a>
+                    </div>
+                `;
+            }
+
+            // Cold, Cough, Sore Throat
+            if (q.includes("cold") || q.includes("cough") || q.includes("throat") || q.includes("phlegm") || q.includes("runny nose")) {
+                return `
+                    <b>Cold & Sore Throat Relief:</b>
+                    <ul>
+                        <li><b>Warm Salt Water Gargle:</b> Gargle with half a teaspoon of salt in warm water 3 times a day to reduce throat inflammation.</li>
+                        <li><b>Steam Inhalation:</b> Inhale warm steam with a drop of eucalyptus oil for 5-10 minutes to clear nasal congestion.</li>
+                        <li><b>Honey & Ginger Tea:</b> Natural demulcent that soothes the throat and suppresses dry coughing.</li>
+                        <li><b>Avoid:</b> Cold drinks, oily and spicy foods during recovery.</li>
+                    </ul>
+                    <div style="margin-top:0.8rem">
+                        <b>Recommended Specialist:</b> <a href="appointment.html" style="font-weight:700">General Physician or ENT Specialist</a>
+                    </div>
+                `;
+            }
+
+            // Stomach pain, acidity, nausea
+            if (q.includes("stomach") || q.includes("acidity") || q.includes("nausea") || q.includes("vomit") || q.includes("digest") || q.includes("diarrhea")) {
+                return `
+                    <b>Digestive & Stomach Care:</b>
+                    <ul>
+                        <li><b>BRAT Diet:</b> Bananas, Rice, Applesauce, and Toast are gentle on the digestive tract.</li>
+                        <li><b>Electrolyte Replacement:</b> Sip ORS (Oral Rehydration Salts) or tender coconut water to replenish lost minerals.</li>
+                        <li><b>Avoid:</b> Dairy products, caffeine, alcohol, and high-fat greasy foods for 24-48 hours.</li>
+                        <li><b>When to see a doctor:</b> Severe acute abdominal cramping, persistent vomiting, or signs of blood require immediate clinical examination.</li>
+                    </ul>
+                    <div style="margin-top:0.8rem">
+                        <b>Recommended Specialist:</b> <a href="appointment.html" style="font-weight:700">Gastroenterologist or Physician</a>
+                    </div>
+                `;
+            }
+
+            // Blood pressure, heart, cholesterol
+            if (q.includes("blood pressure") || q.includes("hypertension") || q.includes("cholesterol") || q.includes("bp")) {
+                return `
+                    <b>Cardiovascular Wellness Guidelines:</b>
+                    <ul>
+                        <li><b>DASH Diet:</b> Focus on leafy green vegetables, whole grains, nuts, and low-fat dairy.</li>
+                        <li><b>Sodium Reduction:</b> Limit table salt intake to less than 1,500mg (about half a teaspoon) per day.</li>
+                        <li><b>Physical Activity:</b> Aim for 30 minutes of moderate aerobic exercise (brisk walking, swimming) 5 days a week.</li>
+                        <li><b>Routine Monitoring:</b> Check blood pressure readings twice weekly and maintain a written log.</li>
+                    </ul>
+                    <div style="margin-top:0.8rem">
+                        <b>Suggested Specialist:</b> <a href="appointment.html?doc=1" style="font-weight:700">Dr. Sarah Jenkins (Cardiologist)</a>
+                    </div>
+                `;
+            }
+
+            // Skin, rash, acne, allergy
+            if (q.includes("skin") || q.includes("rash") || q.includes("itch") || q.includes("acne") || q.includes("allergy")) {
+                return `
+                    <b>Dermatological & Skin Care Guidance:</b>
+                    <ul>
+                        <li><b>Gentle Cleansing:</b> Use fragrance-free, hypoallergenic mild cleanser; avoid vigorous scrubbing.</li>
+                        <li><b>Cool Compress:</b> Apply a clean cool cloth to relieve itchy or inflamed skin.</li>
+                        <li><b>Moisturize:</b> Apply plain petroleum jelly or ceramide-based lotion immediately after bathing.</li>
+                        <li><b>Avoid:</b> Scratching irritated skin as it can cause secondary bacterial infections.</li>
+                    </ul>
+                    <div style="margin-top:0.8rem">
+                        <b>Suggested Specialist:</b> <a href="appointment.html?doc=3" style="font-weight:700">Dr. Emily Chen (Dermatologist)</a>
+                    </div>
+                `;
+            }
+
+            // Burns & First Aid
+            if (q.includes("burn") || q.includes("wound") || q.includes("cut") || q.includes("bleeding") || q.includes("first aid")) {
+                return `
+                    <b>First Aid Protocol:</b>
+                    <ul>
+                        <li><b>For Minor Burns:</b> Run cool (not ice-cold) tap water over the burn for 10-15 minutes. Apply aloe vera gel or burn ointment. Never break blisters or apply butter/toothpaste.</li>
+                        <li><b>For Minor Cuts:</b> Apply firm, direct pressure with a clean cloth until bleeding stops. Wash with water and cover with sterile bandage.</li>
+                        <li><b>Tetanus Shot:</b> Ensure your tetanus vaccination is up to date (within the past 5-10 years) for metal or puncture injuries.</li>
+                    </ul>
+                `;
+            }
+
+            // General Fallback
+            return `
+                <p>Thank you for your question. Here is some clinical guidance on <b>"${query}"</b>:</p>
+                <ul>
+                    <li>Maintain balanced nutrition, adequate hydration (2-3 liters of clean water daily), and 7-8 hours of quality sleep.</li>
+                    <li>If you are experiencing pain, persistent discomfort, or unusual fatigue, it is always best to be examined directly by a certified healthcare specialist.</li>
+                    <li>You can browse our directory of board-certified specialists on DocBook and schedule an in-person or virtual consultation today.</li>
+                </ul>
+                <div style="margin-top:0.8rem">
+                    <a href="appointment.html" class="btn btn-sm btn-primary">📅 Find Available Doctors on DocBook</a>
+                </div>
+            `;
+        }
+
+        function appendMessage(sender, htmlContent) {
+            const container = document.getElementById("chatMessages");
+            const bubble = document.createElement("div");
+            bubble.className = `chat-bubble bubble-${sender}`;
+
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            bubble.innerHTML = `
+                ${htmlContent}
+                <div class="bubble-time">${timeStr}</div>
+            `;
+
+            container.appendChild(bubble);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const container = document.getElementById("chatMessages");
+            const typing = document.createElement("div");
+            typing.id = "typingIndicator";
+            typing.className = "typing-dots";
+            typing.innerHTML = `<span></span><span></span><span></span>`;
+            container.appendChild(typing);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const el = document.getElementById("typingIndicator");
+            if (el) el.remove();
+        }
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById("userInput");
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Render user bubble
+            appendMessage("user", text);
+            input.value = "";
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Simulate AI thinking
+            setTimeout(() => {
+                removeTypingIndicator();
+                const reply = generateAIResponse(text);
+                appendMessage("bot", reply);
+            }, 600);
+        }
+
+        function sendPrompt(promptText) {
+            document.getElementById("userInput").value = promptText;
+            document.querySelector(".chat-input-bar button[type=submit]").click();
+        }
+
+        function clearChat() {
+            const container = document.getElementById("chatMessages");
+            container.innerHTML = `
+                <div class="chat-bubble bubble-bot">
+                    Chat history cleared. How can I assist you with your health today?
+                    <div class="bubble-time">Just now</div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Doctor Appointments — DocBook</title>
+    <meta name="description" content="Search verified specialist doctors and book confirmed appointments with instant scheduling.">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .appointment-layout {
+            display: grid;
+            grid-template-columns: 1.35fr 0.9fr;
+            gap: 2.2rem;
+            align-items: start;
+        }
+
+        .filter-header-bar {
+            background: white;
+            padding: 1.2rem 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.8rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-box-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .search-box-wrap i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.7rem 1rem 0.7rem 2.6rem;
+            border-radius: var(--radius-full);
+            border: 1.5px solid var(--border-color);
+            outline: none;
+            font-size: 0.92rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .specialty-select {
+            padding: 0.7rem 1.2rem;
+            border-radius: var(--radius-full);
+            border: 1.5px solid var(--border-color);
+            outline: none;
+            background: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .my-appts-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 1.6rem;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 5.5rem;
+        }
+
+        .appts-tab-bar {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.6rem;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        .appt-card {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .appt-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            background: white;
+        }
+
+        .appt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .appt-header h4 {
+            font-size: 1.02rem;
+            color: var(--text-primary);
+        }
+
+        .appt-details {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .appt-details i {
+            color: var(--primary);
+            margin-right: 0.3rem;
+        }
+
+        @media (max-width: 900px) {
+            .appointment-layout {
+                grid-template-columns: 1fr;
+            }
+            .my-appts-card {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="site-navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="brand-logo">
+                <div class="brand-icon"><i class="ri-heart-pulse-fill"></i></div>
+                <span>Doc<span class="highlight">Book</span></span>
+            </a>
+
+            <button class="mobile-toggle" onclick="toggleMenu()" aria-label="Toggle navigation">
+                <i class="ri-menu-line"></i>
+            </button>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link"><i class="ri-home-4-line"></i> Home</a></li>
+                <li><a href="appointment.html" class="nav-link active"><i class="ri-calendar-check-line"></i> Appointments</a></li>
+                <li><a href="symptoms.html" class="nav-link"><i class="ri-stethoscope-line"></i> Symptoms</a></li>
+                <li><a href="hospitals.html" class="nav-link"><i class="ri-hospital-line"></i> Hospitals</a></li>
+                <li><a href="ai-help.html" class="nav-link"><i class="ri-robot-2-line"></i> AI Assistant</a></li>
+                <li><a href="ecart.html" class="nav-link"><i class="ri-shopping-bag-3-line"></i> Pharmacy</a></li>
+                <li><a href="about.html" class="nav-link"><i class="ri-information-line"></i> About</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="ecart.html" class="cart-link-btn" title="View Medicine Cart">
+                    <i class="ri-shopping-cart-line"></i>
+                    <span class="cart-badge" id="navCartCount" style="display:none">0</span>
+                </a>
+
+                <div id="navAuthContainer">
+                    <a href="login.html" class="nav-btn nav-btn-outline">Sign In</a>
+                    <a href="register.html" class="nav-btn nav-btn-solid">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APPOINTMENT VIEW -->
+    <main class="page-container">
+        
+        <div class="section-header" style="margin-bottom:2rem;text-align:left">
+            <span class="section-badge">Fast & Easy Consultation</span>
+            <h1 class="section-title">Schedule a Doctor Appointment</h1>
+            <p class="section-desc">Pick your preferred doctor, select a convenient date and time, and confirm your slot instantly.</p>
+        </div>
+
+        <div class="appointment-layout">
+            
+            <!-- LEFT COLUMN: DOCTOR DIRECTORY -->
+            <div>
+                <!-- Filter Bar -->
+                <div class="filter-header-bar">
+                    <div class="search-box-wrap">
+                        <i class="ri-search-line"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search doctor by name or hospital..." oninput="filterDoctors()">
+                    </div>
+
+                    <select id="specialistSelect" class="specialty-select" onchange="filterDoctors()">
+                        <option value="All">All Specialties</option>
+                        <option value="Cardiologist">Cardiologist</option>
+                        <option value="General Physician">General Physician</option>
+                        <option value="Dermatologist">Dermatologist</option>
+                        <option value="Neurologist">Neurologist</option>
+                        <option value="Pediatrician">Pediatrician</option>
+                        <option value="Orthopedic">Orthopedic</option>
+                    </select>
+                </div>
+
+                <!-- Doctors List Grid -->
+                <div id="doctorDirectory" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(290px, 1fr));gap:1.5rem">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: MY APPOINTMENTS SUMMARY -->
+            <div>
+                <div class="my-appts-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                        <h3 style="font-size:1.18rem;font-weight:700">
+                            <i class="ri-calendar-2-line" style="color:var(--primary)"></i> Your Appointments
+                        </h3>
+                        <button class="btn btn-sm btn-secondary" onclick="loadMyAppointments()" title="Refresh Appointments">
+                            <i class="ri-refresh-line"></i>
+                        </button>
+                    </div>
+
+                    <div class="appts-tab-bar">
+                        <button class="tab-btn active" onclick="filterApptTab('All', this)">All</button>
+                        <button class="tab-btn" onclick="filterApptTab('Pending', this)">Pending</button>
+                        <button class="tab-btn" onclick="filterApptTab('Confirmed', this)">Confirmed</button>
+                        <button class="tab-btn" onclick="filterApptTab('Cancelled', this)">Cancelled</button>
+                    </div>
+
+                    <div id="myAppointmentsList" style="max-height:550px;overflow-y:auto;padding-right:4px">
+                        <p style="color:var(--text-muted);font-size:0.9rem;text-align:center;padding:2rem">Loading appointments...</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- BOOKING MODAL -->
+    <div id="bookingModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeModal()"><i class="ri-close-line"></i></button>
+
+            <h3 style="font-size:1.35rem;font-weight:700;margin-bottom:0.4rem">Book Consultation</h3>
+            <p id="modalDoctorSub" style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1.4rem"></p>
+
+            <form id="appointmentForm" onsubmit="handleAppointmentSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" id="patientName" class="form-control" placeholder="Enter patient name" required>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        <input type="email" id="patientEmail" class="form-control" placeholder="name@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mobile Number *</label>
+                        <input type="tel" id="patientMobile" class="form-control" placeholder="+91 98765 43210" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Consultation Date *</label>
+                    <input type="date" id="apptDate" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Select Preferred Time Slot *</label>
+                    <div class="time-slots-grid" id="timeSlotsContainer">
+                        <div class="time-slot-btn active" onclick="selectSlot(this, '09:00 AM')">09:00 AM</div>
+                        <div class="time-slot-btn" onclick="selectSlot(this, '10:30 AM')">10:30 AM</div>
+                        <div class="time-slot-btn" onclick="selectSlot(this, '11:45 AM')">11:45 AM</div>
+                        <div class="time-slot-btn" onclick="selectSlot(this, '02:00 PM')">02:00 PM</div>
+                        <div class="time-slot-btn" onclick="selectSlot(this, '03:30 PM')">03:30 PM</div>
+                        <div class="time-slot-btn" onclick="selectSlot(this, '05:00 PM')">05:00 PM</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Reason / Symptoms (Optional)</label>
+                    <textarea id="apptReason" class="form-control" rows="2" placeholder="Briefly describe what you'd like to consult for..."></textarea>
+                </div>
+
+                <div style="display:flex;gap:0.8rem;margin-top:1.5rem">
+                    <button type="submit" class="btn btn-primary" style="flex:1">
+                        <i class="ri-check-line"></i> Confirm Booking
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST MESSAGE -->
+    <div id="toastMessage" class="toast-msg"></div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3><i class="ri-heart-pulse-fill" style="color:#38bdf8"></i> DocBook</h3>
+                <p>Instant appointments with certified medical practitioners. Completely frontend, server-free, and hosted on GitHub Pages.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Shortcuts</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="symptoms.html">Symptom Checker</a></li>
+                    <li><a href="hospitals.html">Hospitals Radar</a></li>
+                    <li><a href="ai-help.html">AI Assistant</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Accounts</h4>
+                <ul class="footer-links">
+                    <li><a href="user-dashboard.html">Patient Dashboard</a></li>
+                    <li><a href="doctor-dashboard.html">Doctor Dashboard</a></li>
+                    <li><a href="login.html">Login</a></li>
+                    <li><a href="register.html">Register</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <div class="emergency-hotline-box">
+                    <h5>Emergency Services</h5>
+                    <p class="phone">108 / 112</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>© 2026 DocBook Healthcare System. Open Source & Frontend Only.</div>
+        </div>
+    </footer>
+
+    <!-- Storage Script -->
+    <script src="docbook-storage.js"></script>
+
+    <script>
+        let currentDoctor = null;
+        let selectedTime = "09:00 AM";
+        let activeApptFilter = "All";
+
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("show");
+        }
+
+        function showToast(message, type = "success") {
+            const toast = document.getElementById("toastMessage");
+            toast.textContent = message;
+            toast.className = `toast-msg show toast-${type}`;
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3500);
+        }
+
+        // Render Doctor Cards
+        function filterDoctors() {
+            const doctors = DocBookDB.getDoctors();
+            const searchVal = document.getElementById("searchInput").value.toLowerCase().trim();
+            const specialtyVal = document.getElementById("specialistSelect").value;
+            const container = document.getElementById("doctorDirectory");
+
+            const filtered = doctors.filter(doc => {
+                const matchesSearch = doc.name.toLowerCase().includes(searchVal) ||
+                                      (doc.hospital && doc.hospital.toLowerCase().includes(searchVal)) ||
+                                      doc.specialist.toLowerCase().includes(searchVal);
+                const matchesSpecialty = (specialtyVal === "All") || (doc.specialist.toLowerCase() === specialtyVal.toLowerCase());
+                return matchesSearch && matchesSpecialty;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column:1/-1;text-align:center;padding:3rem;background:white;border-radius:var(--radius-lg);border:1px dashed var(--border-color)">
+                        <i class="ri-user-unfollow-line" style="font-size:2.5rem;color:var(--text-light)"></i>
+                        <p style="margin-top:0.8rem;color:var(--text-muted)">No doctors matching your criteria were found.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(doc => `
+                <div class="doctor-card">
+                    <div class="doctor-card-header">
+                        <div class="doctor-avatar-wrap">
+                            <img src="${doc.photo}" alt="${doc.name}" onerror="this.src='https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=300&q=80'">
+                            <div class="online-indicator" title="Available"></div>
+                        </div>
+                        <div class="doctor-meta">
+                            <h3>${doc.name}</h3>
+                            <span class="doctor-specialty-badge">${doc.specialist}</span>
+                            <div class="doctor-rating">
+                                <i class="ri-star-fill star-icon"></i>
+                                <span>${doc.rating || '4.9'}</span>
+                                <span style="color:var(--text-light);font-size:0.8rem">(${doc.experience} yrs exp)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="doctor-body">
+                        <div class="doctor-info-row">
+                            <span class="doctor-info-label"><i class="ri-hospital-line"></i> Clinic</span>
+                            <span class="doctor-info-val">${doc.hospital || 'Metro Clinic'}</span>
+                        </div>
+                        <div class="doctor-info-row">
+                            <span class="doctor-info-label"><i class="ri-money-rupee-circle-line"></i> Fee</span>
+                            <span class="doctor-fee">₹${doc.fee || 600}</span>
+                        </div>
+                        <div class="doctor-info-row">
+                            <span class="doctor-info-label"><i class="ri-time-line"></i> Hours</span>
+                            <span class="doctor-info-val" style="font-size:0.8rem">${doc.timing || '09:00 AM - 04:00 PM'}</span>
+                        </div>
+                    </div>
+
+                    <div class="doctor-actions">
+                        <button class="btn btn-primary" onclick="openBookingModal(${doc.id})">
+                            <i class="ri-calendar-line"></i> Book Appointment
+                        </button>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        // Open Booking Modal
+        function openBookingModal(doctorId) {
+            currentDoctor = DocBookDB.getDoctorById(doctorId);
+            if (!currentDoctor) return;
+
+            document.getElementById("modalDoctorSub").textContent = `Consultation with ${currentDoctor.name} (${currentDoctor.specialist}) • Fee: ₹${currentDoctor.fee || 600}`;
+
+            // Autofill user details if logged in
+            const currentUser = DocBookDB.getCurrentUser();
+            if (currentUser) {
+                document.getElementById("patientName").value = currentUser.name || "";
+                document.getElementById("patientEmail").value = currentUser.email || "";
+                document.getElementById("patientMobile").value = currentUser.mobile || "";
+            }
+
+            // Set min date to today
+            const today = new Date().toISOString().split("T")[0];
+            const dateInput = document.getElementById("apptDate");
+            dateInput.min = today;
+            if (!dateInput.value) dateInput.value = today;
+
+            document.getElementById("bookingModal").classList.add("active");
+        }
+
+        function closeModal() {
+            document.getElementById("bookingModal").classList.remove("active");
+        }
+
+        function selectSlot(btn, time) {
+            document.querySelectorAll("#timeSlotsContainer .time-slot-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedTime = time;
+        }
+
+        // Submit Appointment
+        function handleAppointmentSubmit(e) {
+            e.preventDefault();
+
+            if (!currentDoctor) return;
+
+            const patientName = document.getElementById("patientName").value.trim();
+            const patientEmail = document.getElementById("patientEmail").value.trim();
+            const patientMobile = document.getElementById("patientMobile").value.trim();
+            const apptDate = document.getElementById("apptDate").value;
+            const reason = document.getElementById("apptReason").value.trim();
+
+            const res = DocBookDB.createAppointment({
+                doctor_id: currentDoctor.id,
+                doctor_name: currentDoctor.name,
+                patient_name: patientName,
+                patient_email: patientEmail,
+                patient_mobile: patientMobile,
+                appt_date: apptDate,
+                appt_time: selectedTime,
+                reason: reason || "General Medical Checkup"
+            });
+
+            if (res.success) {
+                closeModal();
+                showToast("🎉 Appointment booked successfully!", "success");
+                loadMyAppointments();
+
+                // If user is not logged in, auto-remember their email for appointment view
+                if (!DocBookDB.getCurrentUser()) {
+                    sessionStorage.setItem("last_patient_email", patientEmail);
+                }
+            } else {
+                showToast(res.message, "error");
+            }
+        }
+
+        // Load Right Side Appointments
+        function loadMyAppointments() {
+            const list = document.getElementById("myAppointmentsList");
+            const currentUser = DocBookDB.getCurrentUser();
+            let email = currentUser ? currentUser.email : sessionStorage.getItem("last_patient_email");
+
+            // If still no email, show all appointments or prompt
+            let appts = email ? DocBookDB.getAppointmentsByEmail(email) : DocBookDB.getAppointments();
+
+            if (activeApptFilter !== "All") {
+                appts = appts.filter(a => a.status.toLowerCase() === activeApptFilter.toLowerCase());
+            }
+
+            if (!appts || appts.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align:center;padding:2rem 1rem;color:var(--text-muted)">
+                        <i class="ri-calendar-event-line" style="font-size:2rem;color:var(--text-light)"></i>
+                        <p style="margin-top:0.6rem;font-size:0.9rem">No ${activeApptFilter !== 'All' ? activeApptFilter : ''} appointments found.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = appts.map(a => {
+                const statusBadge = a.status === "Confirmed" ? "badge-confirmed" : (a.status === "Cancelled" ? "badge-cancelled" : "badge-pending");
+                return `
+                    <div class="appt-card">
+                        <div class="appt-header">
+                            <h4>${a.doctor_name}</h4>
+                            <span class="badge ${statusBadge}">● ${a.status}</span>
+                        </div>
+                        <div class="appt-details">
+                            <div><i class="ri-user-line"></i> ${a.patient_name}</div>
+                            <div><i class="ri-calendar-line"></i> ${a.appt_date} at ${a.appt_time || '10:00 AM'}</div>
+                            <div><i class="ri-file-text-line"></i> ${a.reason || 'General Consultation'}</div>
+                        </div>
+                        ${a.status === 'Pending' ? `
+                            <button class="btn btn-sm btn-danger" style="width:100%" onclick="cancelAppointment(${a.id})">
+                                <i class="ri-close-circle-line"></i> Cancel Request
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function filterApptTab(status, btn) {
+            activeApptFilter = status;
+            document.querySelectorAll(".appts-tab-bar .tab-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            loadMyAppointments();
+        }
+
+        function cancelAppointment(id) {
+            if (confirm("Are you sure you want to cancel this appointment request?")) {
+                DocBookDB.updateAppointmentStatus(id, "Cancelled");
+                showToast("Appointment cancelled.", "info");
+                loadMyAppointments();
+            }
+        }
+
+        // On Load
+        document.addEventListener("DOMContentLoaded", () => {
+            filterDoctors();
+            loadMyAppointments();
+
+            // Check URL param ?doc=ID
+            const params = new URLSearchParams(window.location.search);
+            const docId = params.get("doc");
+            if (docId) {
+                openBookingModal(docId);
+            }
+        });
+    </script>
+</body>
+</html>

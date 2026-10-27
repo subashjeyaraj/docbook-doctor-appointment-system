@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Finder & Emergency Radar — DocBook</title>
+    <meta name="description" content="Locate 24/7 emergency hospitals and multi-specialty care centers nearby using GPS.">
+    
+    <!-- Leaflet CSS & Remix Icons -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .radar-layout {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .map-card-box {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 1.2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        #map {
+            height: 520px;
+            width: 100%;
+            border-radius: var(--radius-lg);
+            z-index: 10;
+        }
+
+        .hospital-sidebar {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 1.6rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hospital-search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: var(--radius-full);
+            border: 1.5px solid var(--border-color);
+            outline: none;
+            font-size: 0.92rem;
+            transition: var(--transition);
+        }
+
+        .hospital-search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .hospital-item-card {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.1rem;
+            margin-bottom: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .hospital-item-card:hover {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: var(--shadow-sm);
+            transform: translateX(3px);
+        }
+
+        .hospital-item-card h4 {
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .hospital-meta {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin: 0.4rem 0 0.8rem;
+        }
+
+        @media (max-width: 900px) {
+            .radar-layout {
+                grid-template-columns: 1fr;
+            }
+            #map {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="site-navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="brand-logo">
+                <div class="brand-icon"><i class="ri-heart-pulse-fill"></i></div>
+                <span>Doc<span class="highlight">Book</span></span>
+            </a>
+
+            <button class="mobile-toggle" onclick="toggleMenu()" aria-label="Toggle navigation">
+                <i class="ri-menu-line"></i>
+            </button>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link"><i class="ri-home-4-line"></i> Home</a></li>
+                <li><a href="appointment.html" class="nav-link"><i class="ri-calendar-check-line"></i> Appointments</a></li>
+                <li><a href="symptoms.html" class="nav-link"><i class="ri-stethoscope-line"></i> Symptoms</a></li>
+                <li><a href="hospitals.html" class="nav-link active"><i class="ri-hospital-line"></i> Hospitals</a></li>
+                <li><a href="ai-help.html" class="nav-link"><i class="ri-robot-2-line"></i> AI Assistant</a></li>
+                <li><a href="ecart.html" class="nav-link"><i class="ri-shopping-bag-3-line"></i> Pharmacy</a></li>
+                <li><a href="about.html" class="nav-link"><i class="ri-information-line"></i> About</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="ecart.html" class="cart-link-btn" title="View Medicine Cart">
+                    <i class="ri-shopping-cart-line"></i>
+                    <span class="cart-badge" id="navCartCount" style="display:none">0</span>
+                </a>
+
+                <div id="navAuthContainer">
+                    <a href="login.html" class="nav-btn nav-btn-outline">Sign In</a>
+                    <a href="register.html" class="nav-btn nav-btn-solid">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container">
+
+        <div class="section-header" style="text-align:left;margin-bottom:2rem">
+            <span class="section-badge">Emergency GPS Radar</span>
+            <h1 class="section-title">Nearby Hospital & Clinic Finder</h1>
+            <p class="section-desc">Search multi-specialty hospitals, emergency centers, and trauma care facilities with real-time geolocation mapping.</p>
+        </div>
+
+        <div class="radar-layout">
+            
+            <!-- MAP CONTAINER -->
+            <div class="map-card-box">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.8rem">
+                    <button class="btn btn-primary btn-sm" id="locateBtn" onclick="findUserLocation()">
+                        <i class="ri-crosshair-2-line"></i> Locate Nearest to Me
+                    </button>
+                    <span id="locStatus" style="font-size:0.85rem;color:var(--text-muted)">Displaying verified medical centers</span>
+                </div>
+
+                <div id="map"></div>
+            </div>
+
+            <!-- HOSPITAL LIST SIDEBAR -->
+            <div class="hospital-sidebar">
+                <div style="position:relative;margin-bottom:1.2rem">
+                    <i class="ri-search-line" style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--text-muted)"></i>
+                    <input type="text" id="hospitalSearch" class="hospital-search-input" placeholder="Search hospitals by name or area..." oninput="filterHospitalList()">
+                </div>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                    <h3 style="font-size:1.15rem;font-weight:700">Verified Hospitals</h3>
+                    <span class="badge badge-confirmed" id="hospitalCountBadge">6 Centers</span>
+                </div>
+
+                <div id="hospitalListContainer" style="max-height:420px;overflow-y:auto;padding-right:4px">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3><i class="ri-heart-pulse-fill" style="color:#38bdf8"></i> DocBook</h3>
+                <p>DocBook hospital finder helps you quickly reach verified emergency medical institutions.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Shortcuts</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="appointment.html">Book Doctors</a></li>
+                    <li><a href="symptoms.html">Symptom Checker</a></li>
+                    <li><a href="ai-help.html">AI Assistant</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Portals</h4>
+                <ul class="footer-links">
+                    <li><a href="user-dashboard.html">Patient Dashboard</a></li>
+                    <li><a href="doctor-dashboard.html">Doctor Dashboard</a></li>
+                    <li><a href="login.html">Sign In</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <div class="emergency-hotline-box">
+                    <h5>Emergency Helpline</h5>
+                    <p class="phone">108 / 112</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>© 2026 DocBook Healthcare System. Open Source & Frontend Only.</div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS & Storage Script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="docbook-storage.js"></script>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("show");
+        }
+
+        // Verified Pre-loaded Hospitals Database
+        const VERIFIED_HOSPITALS = [
+            {
+                name: "Rajiv Gandhi Government General Hospital (GH)",
+                lat: 13.0827,
+                lon: 80.2707,
+                address: "EVR Periyar Salai, Park Town",
+                phone: "+91 44 2530 5000",
+                type: "24/7 Multi-Specialty & Emergency Trauma",
+                beds: "3,000+ Beds"
+            },
+            {
+                name: "Apollo Hospital Main City Center",
+                lat: 13.0604,
+                lon: 80.2496,
+                address: "21 Greams Lane, Thousand Lights",
+                phone: "+91 44 2829 0200",
+                type: "Super Speciality & Cardiology Hub",
+                beds: "600+ Beds"
+            },
+            {
+                name: "Velammal Multi-Speciality Hospital",
+                lat: 13.0839,
+                lon: 80.1673,
+                address: "Mogappair West, Ambattur Industrial Estate",
+                phone: "+91 44 3000 4000",
+                type: "Advanced Emergency & Surgery Care",
+                beds: "450+ Beds"
+            },
+            {
+                name: "Fortis Malar Hospital",
+                lat: 13.0067,
+                lon: 80.2571,
+                address: "No. 52, 1st Main Rd, Gandhi Nagar, Adyar",
+                phone: "+91 44 4289 2222",
+                type: "Cardiac, Neuro & Critical Care",
+                beds: "220+ Beds"
+            },
+            {
+                name: "MIOT International Super Speciality Hospital",
+                lat: 13.0232,
+                lon: 80.1856,
+                address: "4/112, Mount Poonamallee Rd, Manapakkam",
+                phone: "+91 44 4200 2288",
+                type: "Orthopedics, Trauma & Organ Transplant",
+                beds: "1,000+ Beds"
+            },
+            {
+                name: "SIMS Hospital (SRM Institutes for Medical Science)",
+                lat: 13.0524,
+                lon: 80.2114,
+                address: "1 Jawaharlal Nehru Salai, Vadapalani",
+                phone: "+91 44 2000 2001",
+                type: "Multi-Disciplinary Tertiary Care",
+                beds: "345+ Beds"
+            }
+        ];
+
+        let map, markersGroup;
+
+        function initMap() {
+            // Default center Chennai region
+            map = L.map('map').setView([13.0604, 80.2496], 12);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            markersGroup = L.layerGroup().addTo(map);
+
+            renderHospitals(VERIFIED_HOSPITALS);
+        }
+
+        function renderHospitals(list) {
+            markersGroup.clearLayers();
+            const container = document.getElementById("hospitalListContainer");
+            document.getElementById("hospitalCountBadge").textContent = `${list.length} Centers`;
+
+            if (list.length === 0) {
+                container.innerHTML = `<p style="text-align:center;color:var(--text-muted);padding:2rem">No matching hospitals found.</p>`;
+                return;
+            }
+
+            container.innerHTML = list.map((h, idx) => `
+                <div class="hospital-item-card" onclick="focusHospital(${h.lat}, ${h.lon}, '${h.name}')">
+                    <h4><i class="ri-hospital-fill" style="color:var(--primary)"></i> ${h.name}</h4>
+                    <div class="hospital-meta">
+                        <div><i class="ri-map-pin-line"></i> ${h.address}</div>
+                        <div><i class="ri-phone-line"></i> ${h.phone}</div>
+                        <div style="color:var(--status-confirmed);font-weight:600">${h.type}</div>
+                    </div>
+                    <div style="display:flex;gap:0.5rem">
+                        <a href="tel:${h.phone}" class="btn btn-sm btn-secondary" onclick="event.stopPropagation()">
+                            <i class="ri-phone-fill"></i> Call
+                        </a>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lon}" target="_blank" class="btn btn-sm btn-primary" onclick="event.stopPropagation()">
+                            <i class="ri-navigation-line"></i> Directions
+                        </a>
+                    </div>
+                </div>
+            `).join("");
+
+            // Add markers
+            list.forEach(h => {
+                const marker = L.marker([h.lat, h.lon]).addTo(markersGroup);
+                marker.bindPopup(`
+                    <div style="font-family:'Plus Jakarta Sans',sans-serif;padding:4px">
+                        <b style="color:#1d4ed8;font-size:1rem">${h.name}</b>
+                        <div style="font-size:0.85rem;color:#475569;margin:4px 0">${h.address}</div>
+                        <div style="font-size:0.85rem;font-weight:700;color:#059669">${h.phone}</div>
+                        <div style="margin-top:6px">
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lon}" target="_blank" style="color:#2563eb;font-weight:700;font-size:0.85rem">Get Directions →</a>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        function focusHospital(lat, lon, name) {
+            map.flyTo([lat, lon], 15, { duration: 1.2 });
+            markersGroup.eachLayer(layer => {
+                if (layer.getLatLng && layer.getLatLng().lat === lat && layer.getLatLng().lng === lon) {
+                    layer.openPopup();
+                }
+            });
+        }
+
+        function filterHospitalList() {
+            const query = document.getElementById("hospitalSearch").value.toLowerCase().trim();
+            const filtered = VERIFIED_HOSPITALS.filter(h => 
+                h.name.toLowerCase().includes(query) || 
+                h.address.toLowerCase().includes(query) ||
+                h.type.toLowerCase().includes(query)
+            );
+            renderHospitals(filtered);
+        }
+
+        function findUserLocation() {
+            const statusEl = document.getElementById("locStatus");
+
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser.");
+                return;
+            }
+
+            statusEl.textContent = "Detecting your location...";
+
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    statusEl.textContent = "📍 Found your location!";
+
+                    map.setView([lat, lon], 14);
+
+                    // Add custom pulse marker for user
+                    const userMarker = L.circleMarker([lat, lon], {
+                        radius: 10,
+                        fillColor: "#ef4444",
+                        color: "#ffffff",
+                        weight: 3,
+                        opacity: 1,
+                        fillOpacity: 0.9
+                    }).addTo(map);
+
+                    userMarker.bindPopup("<b>📍 You are here</b>").openPopup();
+
+                    // Query nearby hospitals via Overpass API with graceful fallback
+                    const query = `[out:json];(node["amenity"="hospital"](around:5000,${lat},${lon}););out center;`;
+                    fetch("https://overpass-api.de/api/interpreter", {
+                        method: "POST",
+                        body: query
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data && data.elements && data.elements.length > 0) {
+                            const newPlaces = data.elements.map(el => ({
+                                name: (el.tags && el.tags.name) ? el.tags.name : "Local Hospital Care",
+                                lat: el.lat || el.center.lat,
+                                lon: el.lon || el.center.lon,
+                                address: el.tags && el.tags["addr:street"] ? el.tags["addr:street"] : "Nearby Emergency Hospital",
+                                phone: "108",
+                                type: "Emergency Services",
+                                beds: "Verified Center"
+                            }));
+                            renderHospitals([...newPlaces, ...VERIFIED_HOSPITALS]);
+                            statusEl.textContent = `Found ${newPlaces.length} nearby medical centers via GPS!`;
+                        }
+                    })
+                    .catch(() => {
+                        statusEl.textContent = "Using verified hospitals registry around you";
+                    });
+                },
+                err => {
+                    statusEl.textContent = "Location access denied. Showing verified hospital hubs.";
+                }
+            );
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initMap();
+        });
+    </script>
+</body>
+</html>
